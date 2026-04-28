@@ -8,14 +8,30 @@ import { supabase } from '@/lib/supabase';
 
 export default function LoginPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simulate login
-    setTimeout(() => {
+    setError(null);
+
+    try {
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (signInError) throw signInError;
+
       window.location.href = '/dashboard';
-    }, 1500);
+    } catch (err: any) {
+      console.error('Login Error:', err);
+      setError(err.message || 'Invalid email or password');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleGithubSignIn = async () => {
@@ -27,9 +43,9 @@ export default function LoginPage() {
         },
       });
       if (error) throw error;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error signing in with GitHub:', error);
-      alert('Failed to sign in with GitHub');
+      alert(error.message || 'Failed to sign in with GitHub');
     }
   };
 
@@ -54,6 +70,12 @@ export default function LoginPage() {
         </div>
 
         <div className="bg-card border border-border rounded-2xl p-8 shadow-2xl">
+          {error && (
+            <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 text-destructive text-xs font-bold rounded-lg flex items-center gap-2">
+              <Lock className="w-4 h-4" /> {error}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <label className="text-sm font-bold ml-1">Email Address</label>
@@ -62,6 +84,8 @@ export default function LoginPage() {
                 <input 
                   type="email" 
                   placeholder="name@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="w-full bg-background border border-border rounded-xl py-3 pl-10 pr-4 focus:ring-2 focus:ring-primary/50 outline-none transition-all"
                   required
                 />
@@ -78,6 +102,8 @@ export default function LoginPage() {
                 <input 
                   type="password" 
                   placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="w-full bg-background border border-border rounded-xl py-3 pl-10 pr-4 focus:ring-2 focus:ring-primary/50 outline-none transition-all"
                   required
                 />
@@ -119,3 +145,4 @@ export default function LoginPage() {
     </div>
   );
 }
+

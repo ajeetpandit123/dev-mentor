@@ -1,6 +1,6 @@
 export async function callAnthropic(messages: { role: string, content: string }[], system?: string, response_format?: any) {
   const apiKey = process.env.ANTHROPIC_API_KEY?.trim().replace(/^["']|["']$/g, '');
-  const model = (process.env.ANTHROPIC_MODEL || 'claude-3-5-sonnet-latest').trim().replace(/^["']|["']$/g, '');
+  const model = (process.env.ANTHROPIC_MODEL || 'claude-sonnet-4-6').trim().replace(/^["']|["']$/g, '');
   
   if (!apiKey) {
     throw new Error('ANTHROPIC_API_KEY is missing');

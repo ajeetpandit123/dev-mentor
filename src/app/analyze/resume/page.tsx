@@ -39,17 +39,21 @@ export default function ResumeAnalyzerPage() {
         body: formData,
       });
       
-      const data = await response.json();
+      let data;
+      try {
+        data = await response.json();
+      } catch (e) {
+        throw new Error('Failed to parse server response');
+      }
       
-      if (data.error) {
-        alert(data.error);
-        return;
+      if (!response.ok || data.error) {
+        throw new Error(data.error || `Server responded with ${response.status}`);
       }
       
       setResult(data);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert('Failed to analyze resume');
+      alert(err.message || 'Failed to analyze resume');
     } finally {
       setIsAnalyzing(false);
     }

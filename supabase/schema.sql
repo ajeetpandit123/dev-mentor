@@ -54,6 +54,16 @@ create table chat_history (
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
+-- Activities table
+create table activities (
+  id uuid default uuid_generate_v4() primary key,
+  user_id uuid references auth.users on delete cascade not null,
+  title text,
+  description text,
+  type text,
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
 -- Set up Row Level Security (RLS)
 alter table profiles enable row level security;
 alter table projects enable row level security;
@@ -61,6 +71,7 @@ alter table resumes enable row level security;
 alter table skills enable row level security;
 alter table roadmaps enable row level security;
 alter table chat_history enable row level security;
+alter table activities enable row level security;
 
 -- Policies
 create policy "Users can view their own profile" on profiles for select using (auth.uid() = id);
@@ -80,3 +91,20 @@ create policy "Users can insert their own roadmaps" on roadmaps for insert with 
 
 create policy "Users can view their own chat history" on chat_history for select using (auth.uid() = user_id);
 create policy "Users can insert their own chat history" on chat_history for insert with check (auth.uid() = user_id);
+
+create policy "Users can view their own activities" on activities for select using (auth.uid() = user_id);
+create policy "Users can insert their own activities" on activities for insert with check (auth.uid() = user_id);
+
+-- Trigger for automatic profile creation
+create or replace function public.handle_new_user()
+returns trigger as $$
+begin
+  insert into public.profiles (id, email, full_name)
+  values (new.id, new.email, new.raw_user_meta_data->>'full_name');
+  return new;
+end;
+$$ language plpgsql security definer;
+
+create trigger on_auth_user_created
+  after insert on auth.users
+  for each row execute procedure public.handle_new_user();

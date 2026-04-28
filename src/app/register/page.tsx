@@ -8,14 +8,49 @@ import { supabase } from '@/lib/supabase';
 
 export default function RegisterPage() {
   const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [fullName, setFullName] = useState('');
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-    // Simulate register
-    setTimeout(() => {
-      window.location.href = '/dashboard';
-    }, 1500);
+    setError(null);
+
+    try {
+      const { data, error: signUpError } = await supabase.auth.signUp({
+        email,
+        password,
+        options: {
+          data: {
+            full_name: fullName,
+          },
+          emailRedirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+
+      if (signUpError) throw signUpError;
+
+      if (data.user) {
+        // Create profile entry
+        const { error: profileError } = await supabase
+          .from('profiles')
+          .insert([
+            { id: data.user.id, email: email, full_name: fullName }
+          ]);
+        
+        if (profileError) console.error('Error creating profile:', profileError);
+        
+        alert('Check your email for the confirmation link!');
+        window.location.href = '/login';
+      }
+    } catch (err: any) {
+      console.error('Registration Error:', err);
+      setError(err.message || 'Failed to create account');
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const handleGithubSignIn = async () => {
@@ -27,9 +62,9 @@ export default function RegisterPage() {
         },
       });
       if (error) throw error;
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error signing in with GitHub:', error);
-      alert('Failed to sign in with GitHub');
+      alert(error.message || 'Failed to sign in with GitHub');
     }
   };
 
@@ -54,6 +89,12 @@ export default function RegisterPage() {
         </div>
 
         <div className="bg-card border border-border rounded-2xl p-8 shadow-2xl">
+          {error && (
+            <div className="mb-4 p-3 bg-destructive/10 border border-destructive/20 text-destructive text-xs font-bold rounded-lg flex items-center gap-2">
+              <Mail className="w-4 h-4" /> {error}
+            </div>
+          )}
+
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-2">
               <label className="text-sm font-bold ml-1">Full Name</label>
@@ -62,6 +103,8 @@ export default function RegisterPage() {
                 <input 
                   type="text" 
                   placeholder="John Doe"
+                  value={fullName}
+                  onChange={(e) => setFullName(e.target.value)}
                   className="w-full bg-background border border-border rounded-xl py-3 pl-10 pr-4 focus:ring-2 focus:ring-primary/50 outline-none transition-all"
                   required
                 />
@@ -75,6 +118,8 @@ export default function RegisterPage() {
                 <input 
                   type="email" 
                   placeholder="name@example.com"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                   className="w-full bg-background border border-border rounded-xl py-3 pl-10 pr-4 focus:ring-2 focus:ring-primary/50 outline-none transition-all"
                   required
                 />
@@ -88,8 +133,11 @@ export default function RegisterPage() {
                 <input 
                   type="password" 
                   placeholder="••••••••"
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
                   className="w-full bg-background border border-border rounded-xl py-3 pl-10 pr-4 focus:ring-2 focus:ring-primary/50 outline-none transition-all"
                   required
+                  minLength={6}
                 />
               </div>
             </div>
@@ -129,3 +177,4 @@ export default function RegisterPage() {
     </div>
   );
 }
+
