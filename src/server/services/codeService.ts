@@ -98,13 +98,21 @@ export async function analyzeRepository(repoUrl: string) {
     // 6. Save to Supabase (Optional - depends on table existence)
     try {
       console.log('Saving to database...');
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        console.warn('User not logged in, skipping database save.');
+        return result;
+      }
+
       const { data: analysisData, error: analysisError } = await supabase
-        .from('repo_analyses')
+        .from('projects')
         .insert({
+          user_id: user.id,
           repo_url: repoUrl,
           repo_name: repo,
           score: result.score,
-          details: result
+          analysis_result: result
         })
         .select()
         .single();

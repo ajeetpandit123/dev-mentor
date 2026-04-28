@@ -33,15 +33,6 @@ export default function RegisterPage() {
       if (signUpError) throw signUpError;
 
       if (data.user) {
-        // Create profile entry
-        const { error: profileError } = await supabase
-          .from('profiles')
-          .insert([
-            { id: data.user.id, email: email, full_name: fullName }
-          ]);
-        
-        if (profileError) console.error('Error creating profile:', profileError);
-        
         alert('Check your email for the confirmation link!');
         window.location.href = '/login';
       }

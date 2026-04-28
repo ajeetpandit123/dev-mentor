@@ -34,17 +34,26 @@ export async function analyzeResume(fileBuffer: Buffer) {
 
     // 3. Save to Supabase (Optional)
     try {
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        console.warn('User not logged in, skipping database save.');
+        return result;
+      }
+
       const { data: analysisData, error: analysisError } = await supabase
-        .from('resume_analyses')
+        .from('resumes')
         .insert({
-          score: result.atsScore,
-          details: result
+          user_id: user.id,
+          ats_score: result.atsScore,
+          analysis_result: result
         })
         .select()
         .single();
 
       if (!analysisError) {
         await supabase.from('activities').insert({
+          user_id: user.id,
           title: 'Resume Uploaded',
           description: `ATS score improved to ${result.atsScore}`,
           type: 'resume_analysis'

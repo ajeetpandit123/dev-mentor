@@ -7,7 +7,7 @@ export async function getDashboardData(userId?: string) {
   try {
     // 1. Fetch latest repo analysis
     const { data: latestRepo } = await supabase
-      .from('repo_analyses')
+      .from('projects')
       .select('*')
       .order('created_at', { ascending: false })
       .limit(1)
@@ -15,7 +15,7 @@ export async function getDashboardData(userId?: string) {
 
     // 2. Fetch latest resume analysis
     const { data: latestResume } = await supabase
-      .from('resume_analyses')
+      .from('resumes')
       .select('*')
       .order('created_at', { ascending: false })
       .limit(1)
@@ -34,7 +34,7 @@ export async function getDashboardData(userId?: string) {
         codeQuality: latestRepo?.score || 8.4,
         skillProgress: 64, // This could be calculated from roadmap tasks
         roadmapTasks: "12/18",
-        atsScore: latestResume?.score || 82,
+        atsScore: latestResume?.ats_score || 82,
       },
       skillDevelopment: [40, 70, 45, 90, 65, 80, 55], // Weekly trend
       recentActivity: activities?.map(a => ({
