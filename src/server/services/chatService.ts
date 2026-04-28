@@ -1,4 +1,4 @@
-import { openai } from '@/lib/openai';
+import { callAnthropic } from '@/lib/anthropic';
 
 export async function getMentorResponse(messages: any[], context: any = {}) {
   try {
@@ -10,17 +10,14 @@ export async function getMentorResponse(messages: any[], context: any = {}) {
       Stay focused on technical growth and specific project improvements.
     `;
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-4-turbo-preview",
-      messages: [
-        { role: "system", content: systemPrompt },
-        ...(Array.isArray(messages) ? messages : [])
-      ],
-    });
+    const response = await callAnthropic(
+      messages.map(m => ({ role: m.role, content: m.content })),
+      systemPrompt
+    );
 
     return {
       role: 'assistant',
-      content: response.choices[0].message.content
+      content: response
     };
   } catch (error: any) {
     console.error('Chat Service Error:', error);

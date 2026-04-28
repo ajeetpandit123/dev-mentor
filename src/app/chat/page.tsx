@@ -54,17 +54,46 @@ export default function ChatMentorPage() {
     setInput('');
     setIsLoading(true);
 
-    // Mock AI response
-    setTimeout(() => {
-      const aiMessage: Message = {
-        id: (Date.now() + 1).toString(),
-        role: 'assistant',
-        content: "That's a great question about Next.js Middleware! Since your current projects use Supabase, I recommend looking into how you can handle session refreshing directly in the middleware to ensure consistent auth state across your edge routes.",
-        timestamp: new Date()
-      };
-      setMessages(prev => [...prev, aiMessage]);
-      setIsLoading(false);
-    }, 2000);
+    // Real AI API call
+    const fetchResponse = async () => {
+      try {
+        const response = await fetch('/api/chat', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ 
+            messages: [...messages, userMessage].map(m => ({ role: m.role, content: m.content })),
+            context: { platform: 'DevMentor AI', features: ['Repo Analysis', 'Roadmaps', 'Resume Optimizer'] }
+          }),
+        });
+
+        const data = await response.json();
+
+        if (data.error) {
+          throw new Error(data.error);
+        }
+
+        const aiMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: data.content,
+          timestamp: new Date()
+        };
+        setMessages(prev => [...prev, aiMessage]);
+      } catch (err) {
+        console.error('Chat Error:', err);
+        const errorMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          role: 'assistant',
+          content: "I'm sorry, I'm having trouble connecting to my brain right now. Please try again in a moment.",
+          timestamp: new Date()
+        };
+        setMessages(prev => [...prev, errorMessage]);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchResponse();
   };
 
   return (

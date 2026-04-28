@@ -22,6 +22,13 @@ export default function RepoAnalysisPage() {
 
   const handleAnalyze = async () => {
     if (!url) return;
+    
+    const githubRegex = /(?:https?:\/\/)?(?:www\.)?github\.com\/([^\/]+)\/([^\/]+)/;
+    if (!githubRegex.test(url)) {
+      alert('Please enter a valid GitHub repository URL (e.g., https://github.com/username/repo)');
+      return;
+    }
+
     setIsAnalyzing(true);
     setResult(null);
 

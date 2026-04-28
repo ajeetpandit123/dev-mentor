@@ -1,11 +1,11 @@
 import OpenAI from 'openai';
 
-const apiKey = process.env.OPENAI_API_KEY;
+const apiKey = process.env.OPENAI_API_KEY?.trim();
 
 if (!apiKey) {
-  console.warn('OPENAI_API_KEY is missing. AI features will fail.');
+  console.error('❌ OPENAI_API_KEY is missing in .env file');
 }
 
 export const openai = new OpenAI({
-  apiKey: apiKey || 'missing-key',
+  apiKey: apiKey || '', 
 });

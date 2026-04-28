@@ -10,45 +10,81 @@ import {
   Rocket, 
   TrendingUp,
   AlertCircle,
-  CheckCircle2
+  CheckCircle2,
+  Loader2
 } from 'lucide-react';
 
 export default function DashboardPage() {
+  const [data, setData] = React.useState<any>(null);
+  const [isLoading, setIsLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    fetch('/api/dashboard')
+      .then(res => res.json())
+      .then(data => {
+        setData(data);
+        setIsLoading(false);
+      })
+      .catch(err => {
+        console.error('Failed to fetch dashboard:', err);
+        setIsLoading(false);
+      });
+  }, []);
+
+  if (isLoading) {
+    return (
+      <DashboardLayout>
+        <div className="flex items-center justify-center h-[80vh]">
+          <Loader2 className="w-8 h-8 animate-spin text-primary" />
+        </div>
+      </DashboardLayout>
+    );
+  }
+
+  const dashboardData = data || {
+    stats: { codeQuality: "8.4", skillProgress: 64, roadmapTasks: "12/18", atsScore: 82 },
+    skillDevelopment: [40, 70, 45, 90, 65, 80, 55],
+    recentActivity: []
+  };
+
   return (
     <DashboardLayout>
       <div className="space-y-8">
         {/* Header */}
-        <div>
+        <motion.div 
+          initial={{ opacity: 0, y: -10 }}
+          animate={{ opacity: 1, y: 0 }}
+        >
           <h1 className="text-3xl font-bold mb-2">Welcome back, Developer</h1>
           <p className="text-muted-foreground">Here is your growth overview for this week.</p>
-        </div>
+        </motion.div>
 
         {/* Stats Grid */}
         <div className="grid md:grid-cols-4 gap-6">
           <StatCard 
             title="Code Quality" 
-            value="8.4" 
+            value={dashboardData.stats.codeQuality} 
             sub="Avg Score" 
             trend="+1.2%" 
             icon={Code2} 
           />
           <StatCard 
             title="Skill Progress" 
-            value="64%" 
+            value={`${dashboardData.stats.skillProgress}%`} 
             sub="Total Completion" 
             trend="+5%" 
             icon={TrendingUp} 
           />
           <StatCard 
             title="Roadmap Tasks" 
-            value="12/18" 
+            value={dashboardData.stats.roadmapTasks} 
             sub="Completed" 
             trend="+2 this week" 
             icon={CheckCircle2} 
           />
           <StatCard 
             title="ATS Score" 
-            value="82" 
+            value={dashboardData.stats.atsScore} 
             sub="Resume Quality" 
             trend="Ready" 
             icon={FileText} 
@@ -65,7 +101,7 @@ export default function DashboardPage() {
                 </h3>
               </div>
               <div className="flex-1 flex items-end gap-4 px-4">
-                {[40, 70, 45, 90, 65, 80, 55].map((h, i) => (
+                {dashboardData.skillDevelopment.map((h: number, i: number) => (
                   <div key={i} className="flex-1 flex flex-col items-center gap-2">
                     <motion.div 
                       initial={{ height: 0 }}
@@ -111,21 +147,14 @@ export default function DashboardPage() {
             <div className="bg-card border border-border rounded-2xl p-6">
               <h3 className="font-bold mb-6">Recent Activity</h3>
               <div className="space-y-6">
-                <ActivityItem 
-                  time="2 hours ago" 
-                  title="Repo Analyzed" 
-                  desc="Portfolio-V2 reached 8.7/10" 
-                />
-                <ActivityItem 
-                  time="Yesterday" 
-                  title="Resume Uploaded" 
-                  desc="ATS score improved to 82" 
-                />
-                <ActivityItem 
-                  time="2 days ago" 
-                  title="New Roadmap" 
-                  desc="Fullstack Engineer path started" 
-                />
+                {dashboardData.recentActivity.map((activity: any, i: number) => (
+                  <ActivityItem 
+                    key={i}
+                    time={activity.time} 
+                    title={activity.title} 
+                    desc={activity.desc} 
+                  />
+                ))}
               </div>
             </div>
           </div>

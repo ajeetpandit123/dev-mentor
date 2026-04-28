@@ -1,5 +1,6 @@
-import { openai } from '@/lib/openai';
+import { callAnthropic } from '@/lib/anthropic';
 import pdf from 'pdf-parse';
+import { supabase } from '@/lib/supabase';
 
 export async function analyzeResume(fileBuffer: Buffer) {
   try {
@@ -25,13 +26,35 @@ export async function analyzeResume(fileBuffer: Buffer) {
       }
     `;
 
-    const response = await openai.chat.completions.create({
-      model: "gpt-4-turbo-preview",
-      messages: [{ role: "system", content: "You are an expert career coach and ATS specialist." }, { role: "user", content: prompt }],
-      response_format: { type: "json_object" }
-    });
+    const result = await callAnthropic(
+      [{ role: "user", content: prompt }],
+      "You are an expert career coach and ATS specialist.",
+      { type: "json_object" }
+    );
 
-    return JSON.parse(response.choices[0].message.content || '{}');
+    // 3. Save to Supabase (Optional)
+    try {
+      const { data: analysisData, error: analysisError } = await supabase
+        .from('resume_analyses')
+        .insert({
+          score: result.atsScore,
+          details: result
+        })
+        .select()
+        .single();
+
+      if (!analysisError) {
+        await supabase.from('activities').insert({
+          title: 'Resume Uploaded',
+          description: `ATS score improved to ${result.atsScore}`,
+          type: 'resume_analysis'
+        });
+      }
+    } catch (dbError) {
+      console.warn('Could not save to database:', dbError);
+    }
+
+    return result;
   } catch (error: any) {
     console.error('Resume Service Error:', error);
     throw error;
