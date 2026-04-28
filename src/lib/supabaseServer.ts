@@ -10,14 +10,10 @@ export async function createClient() {
     {
       cookies: {
         get(name: string) {
-          const allCookies = cookieStore.getAll();
-          console.log('DEBUG: Available Cookies:', allCookies.map(c => c.name).join(', '));
-          console.log('DEBUG: Looking for Cookie:', name);
           return cookieStore.get(name)?.value;
         },
         set(name: string, value: string, options: CookieOptions) {
           try {
-            console.log('DEBUG: Setting Cookie:', name);
             cookieStore.set({ 
               name, 
               value, 
@@ -26,12 +22,11 @@ export async function createClient() {
               sameSite: 'lax'
             });
           } catch (error) {
-            console.warn('DEBUG: Cookie Set Error (likely Server Component):', name);
+            // The `set` method was called from a Server Component.
           }
         },
         remove(name: string, options: CookieOptions) {
           try {
-            console.log('DEBUG: Removing Cookie:', name);
             cookieStore.set({ 
               name, 
               value: '', 
@@ -40,7 +35,7 @@ export async function createClient() {
               sameSite: 'lax'
             });
           } catch (error) {
-            console.warn('DEBUG: Cookie Remove Error:', name);
+            // The `delete` method was called from a Server Component.
           }
         },
       },

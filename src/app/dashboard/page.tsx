@@ -52,8 +52,17 @@ export default function DashboardPage() {
   }
 
   const dashboardData = data || {
+    userName: 'Developer',
     stats: { codeQuality: "8.4", skillProgress: 64, roadmapTasks: "12/18", atsScore: 82 },
     skillDevelopment: [40, 70, 45, 90, 65, 80, 55],
+    recommendations: [
+      { title: "Master Next.js Middleware", desc: "Your last project lacked edge functions.", icon: 'rocket' },
+      { title: "Optimize SQL Queries", desc: "Performance score was low.", icon: 'alert' }
+    ],
+    goals: [
+      { label: "Complete Docker Basics", progress: 75 },
+      { label: "Refactor Resume", progress: 30 }
+    ],
     recentActivity: []
   };
 
@@ -65,7 +74,7 @@ export default function DashboardPage() {
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
         >
-          <h1 className="text-3xl font-bold mb-2">Welcome back, Developer</h1>
+          <h1 className="text-3xl font-bold mb-2">Welcome back, {dashboardData.userName}</h1>
           <p className="text-muted-foreground">Here is your growth overview for this week.</p>
         </motion.div>
 
@@ -130,23 +139,22 @@ export default function DashboardPage() {
               <div className="bg-card border border-border rounded-2xl p-6">
                 <h3 className="font-bold mb-4">Top Recommendations</h3>
                 <div className="space-y-4">
-                  <RecommendationItem 
-                    icon={Rocket} 
-                    title="Master Next.js Middleware" 
-                    desc="Your last project lacked edge functions."
-                  />
-                  <RecommendationItem 
-                    icon={AlertCircle} 
-                    title="Optimize SQL Queries" 
-                    desc="Performance score was low in 'e-commerce-api'."
-                  />
+                  {dashboardData.recommendations.map((rec: any, i: number) => (
+                    <RecommendationItem 
+                      key={i}
+                      icon={rec.icon === 'rocket' ? Rocket : AlertCircle} 
+                      title={rec.title} 
+                      desc={rec.desc}
+                    />
+                  ))}
                 </div>
               </div>
               <div className="bg-card border border-border rounded-2xl p-6">
                 <h3 className="font-bold mb-4">Upcoming Goals</h3>
                 <div className="space-y-4">
-                  <GoalItem label="Complete Docker Basics" progress={75} />
-                  <GoalItem label="Refactor Resume Bullet Points" progress={30} />
+                  {dashboardData.goals.map((goal: any, i: number) => (
+                    <GoalItem key={i} label={goal.label} progress={goal.progress} />
+                  ))}
                 </div>
               </div>
             </div>

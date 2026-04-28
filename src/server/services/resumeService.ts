@@ -1,6 +1,6 @@
+import { getServiceSupabase } from '@/lib/supabase';
 import { callAnthropic } from '@/lib/anthropic';
 import pdf from 'pdf-parse';
-import { supabase } from '@/lib/supabase';
 
 export async function analyzeResume(fileBuffer: Buffer, userId?: string) {
   try {

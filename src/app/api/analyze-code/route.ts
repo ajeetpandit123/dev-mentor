@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    console.log('DEBUG: Code API Route User ID:', user?.id || 'NULL');
+    const { repoUrl } = await req.json();
 
     if (!repoUrl) {
       return NextResponse.json({ error: 'Repository URL is required' }, { status: 400 });

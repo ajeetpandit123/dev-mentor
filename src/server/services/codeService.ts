@@ -1,8 +1,8 @@
 import { octokit } from '@/lib/octokit';
 import { callAnthropic } from '@/lib/anthropic';
-import { supabase } from '@/lib/supabase';
+import { getServiceSupabase } from '@/lib/supabase';
 
-export async function analyzeRepository(repoUrl: string) {
+export async function analyzeRepository(repoUrl: string, userId?: string) {
   try {
     // Robust regex to extract owner and repo from various GitHub URL formats
     const githubRegex = /(?:https?:\/\/)?(?:www\.)?github\.com\/([^\/]+)\/([^\/]+)/;

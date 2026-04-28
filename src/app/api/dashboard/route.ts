@@ -17,8 +17,6 @@ export async function GET(req: Request) {
       }
     }
 
-    console.log('DEBUG: Dashboard API User ID:', user?.id || 'NULL');
-
     const data = await getDashboardData(user?.id);
     return NextResponse.json(data);
   } catch (error: any) {

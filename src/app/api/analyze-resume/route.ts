@@ -17,8 +17,6 @@ export async function POST(req: NextRequest) {
       }
     }
     
-    console.log('DEBUG: API Route User ID:', user?.id || 'NULL');
-
     const formData = await req.formData();
     const file = formData.get('file');
 
