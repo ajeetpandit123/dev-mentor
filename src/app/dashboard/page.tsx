@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { supabase } from '@/lib/supabase';
 import { motion } from 'framer-motion';
 import { 
   BarChart3, 
@@ -19,16 +20,25 @@ export default function DashboardPage() {
   const [isLoading, setIsLoading] = React.useState(true);
 
   React.useEffect(() => {
-    fetch('/api/dashboard')
-      .then(res => res.json())
-      .then(data => {
+    async function fetchData() {
+      try {
+        const { data: { session } } = await supabase.auth.getSession();
+        const headers: any = {};
+        
+        if (session?.access_token) {
+          headers['Authorization'] = `Bearer ${session.access_token}`;
+        }
+
+        const res = await fetch('/api/dashboard', { headers });
+        const data = await res.json();
         setData(data);
         setIsLoading(false);
-      })
-      .catch(err => {
+      } catch (err) {
         console.error('Failed to fetch dashboard:', err);
         setIsLoading(false);
-      });
+      }
+    }
+    fetchData();
   }, []);
 
   if (isLoading) {

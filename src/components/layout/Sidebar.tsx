@@ -11,10 +11,14 @@ import {
   MessageSquare, 
   Settings, 
   LogOut,
-  ChevronRight
+  ChevronRight,
+  User as UserIcon,
+  Loader2
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
+import { supabase } from '@/lib/supabase';
+import { useRouter } from 'next/navigation';
 
 const menuItems = [
   { icon: LayoutDashboard, label: 'Overview', href: '/dashboard' },
@@ -26,6 +30,38 @@ const menuItems = [
 
 export function Sidebar() {
   const pathname = usePathname();
+  const router = useRouter();
+  const [user, setUser] = React.useState<any>(null);
+  const [profile, setProfile] = React.useState<any>(null);
+  const [loading, setLoading] = React.useState(true);
+
+  React.useEffect(() => {
+    async function getProfile() {
+      try {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (user) {
+          setUser(user);
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('*')
+            .eq('id', user.id)
+            .single();
+          setProfile(profile);
+        }
+      } catch (error) {
+        console.error('Error fetching profile:', error);
+      } finally {
+        setLoading(false);
+      }
+    }
+    getProfile();
+  }, []);
+
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
+    router.push('/login');
+    router.refresh();
+  };
 
   return (
     <div className="w-64 h-screen bg-card border-r border-border flex flex-col p-4">
@@ -65,21 +101,42 @@ export function Sidebar() {
         })}
       </nav>
 
-      <div className="mt-auto pt-4 border-t border-border space-y-1">
-        <Link
-          href="/settings"
-          className="flex items-center gap-3 px-3 py-2 rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground transition-all duration-200"
-        >
-          <Settings className="w-5 h-5" />
-          <span className="font-medium">Settings</span>
-        </Link>
-        <button
-          className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all duration-200"
-        >
-          <LogOut className="w-5 h-5" />
-          <span className="font-medium">Logout</span>
-        </button>
+      <div className="mt-auto pt-4 border-t border-border space-y-4">
+        {/* User Profile Section */}
+        <div className="px-3 py-2 flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center overflow-hidden">
+            {(profile?.avatar_url || user?.user_metadata?.avatar_url) ? (
+              <img src={profile?.avatar_url || user?.user_metadata?.avatar_url} alt="Avatar" className="w-full h-full object-cover" />
+            ) : (
+              <UserIcon className="w-5 h-5 text-primary" />
+            )}
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-bold truncate">
+              {profile?.full_name || user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'User'}
+            </p>
+            <p className="text-xs text-muted-foreground truncate">{user?.email}</p>
+          </div>
+        </div>
+
+        <div className="space-y-1">
+          <Link
+            href="/settings"
+            className="flex items-center gap-3 px-3 py-2 rounded-lg text-muted-foreground hover:bg-accent hover:text-foreground transition-all duration-200"
+          >
+            <Settings className="w-5 h-5" />
+            <span className="font-medium">Settings</span>
+          </Link>
+          <button
+            onClick={handleLogout}
+            className="w-full flex items-center gap-3 px-3 py-2 rounded-lg text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all duration-200"
+          >
+            <LogOut className="w-5 h-5" />
+            <span className="font-medium">Logout</span>
+          </button>
+        </div>
       </div>
     </div>
   );
 }
+

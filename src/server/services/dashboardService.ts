@@ -9,22 +9,25 @@ export async function getDashboardData(userId?: string) {
     const { data: latestRepo } = await supabase
       .from('projects')
       .select('*')
+      .eq('user_id', userId)
       .order('created_at', { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
 
     // 2. Fetch latest resume analysis
     const { data: latestResume } = await supabase
       .from('resumes')
       .select('*')
+      .eq('user_id', userId)
       .order('created_at', { ascending: false })
       .limit(1)
-      .single();
+      .maybeSingle();
 
     // 3. Fetch recent activities
     const { data: activities } = await supabase
       .from('activities')
       .select('*')
+      .eq('user_id', userId)
       .order('created_at', { ascending: false })
       .limit(5);
 

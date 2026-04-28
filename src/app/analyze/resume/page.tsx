@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { supabase } from '@/lib/supabase';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   FileText, 
@@ -34,8 +35,15 @@ export default function ResumeAnalyzerPage() {
       const formData = new FormData();
       formData.append('file', file);
 
+      const { data: { session } } = await supabase.auth.getSession();
+      const headers: any = {};
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`;
+      }
+
       const response = await fetch('/api/analyze-resume', {
         method: 'POST',
+        headers,
         body: formData,
       });
       

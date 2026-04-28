@@ -2,6 +2,7 @@
 
 import React, { useState } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { supabase } from '@/lib/supabase';
 import { motion, AnimatePresence } from 'framer-motion';
 import { 
   Github, 
@@ -32,11 +33,16 @@ export default function RepoAnalysisPage() {
     setIsAnalyzing(true);
     setResult(null);
 
-    // Mock API call for now
     try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const headers: any = { 'Content-Type': 'application/json' };
+      if (session?.access_token) {
+        headers['Authorization'] = `Bearer ${session.access_token}`;
+      }
+
       const response = await fetch('/api/analyze-code', {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        headers,
         body: JSON.stringify({ repoUrl: url }),
       });
       

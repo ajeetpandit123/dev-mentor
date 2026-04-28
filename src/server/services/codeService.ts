@@ -98,17 +98,18 @@ export async function analyzeRepository(repoUrl: string) {
     // 6. Save to Supabase (Optional - depends on table existence)
     try {
       console.log('Saving to database...');
-      const { data: { user } } = await supabase.auth.getUser();
       
-      if (!user) {
-        console.warn('User not logged in, skipping database save.');
+      if (!userId) {
+        console.warn('User ID not provided, skipping database save.');
         return result;
       }
 
-      const { data: analysisData, error: analysisError } = await supabase
+      const adminSupabase = getServiceSupabase();
+
+      const { data: analysisData, error: analysisError } = await adminSupabase
         .from('projects')
         .insert({
-          user_id: user.id,
+          user_id: userId,
           repo_url: repoUrl,
           repo_name: repo,
           score: result.score,
@@ -118,9 +119,10 @@ export async function analyzeRepository(repoUrl: string) {
         .single();
 
       if (analysisError) {
-        console.warn('Supabase Error (repo_analyses):', analysisError.message);
+        console.warn('Supabase Error (projects):', analysisError.message);
       } else {
-        await supabase.from('activities').insert({
+        await adminSupabase.from('activities').insert({
+          user_id: userId,
           title: 'Repo Analyzed',
           description: `${repo} reached ${result.score}/10`,
           type: 'repo_analysis'

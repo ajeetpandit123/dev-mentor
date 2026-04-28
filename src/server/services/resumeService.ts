@@ -2,7 +2,7 @@ import { callAnthropic } from '@/lib/anthropic';
 import pdf from 'pdf-parse';
 import { supabase } from '@/lib/supabase';
 
-export async function analyzeResume(fileBuffer: Buffer) {
+export async function analyzeResume(fileBuffer: Buffer, userId?: string) {
   try {
     // 1. Extract text from PDF
     const data = await pdf(fileBuffer);
@@ -34,17 +34,17 @@ export async function analyzeResume(fileBuffer: Buffer) {
 
     // 3. Save to Supabase (Optional)
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      
-      if (!user) {
-        console.warn('User not logged in, skipping database save.');
+      if (!userId) {
+        console.warn('User ID not provided, skipping database save.');
         return result;
       }
 
-      const { data: analysisData, error: analysisError } = await supabase
+      const adminSupabase = getServiceSupabase();
+
+      const { data: analysisData, error: analysisError } = await adminSupabase
         .from('resumes')
         .insert({
-          user_id: user.id,
+          user_id: userId,
           ats_score: result.atsScore,
           analysis_result: result
         })
@@ -52,8 +52,8 @@ export async function analyzeResume(fileBuffer: Buffer) {
         .single();
 
       if (!analysisError) {
-        await supabase.from('activities').insert({
-          user_id: user.id,
+        await adminSupabase.from('activities').insert({
+          user_id: userId,
           title: 'Resume Uploaded',
           description: `ATS score improved to ${result.atsScore}`,
           type: 'resume_analysis'
