@@ -5,13 +5,15 @@ export async function getDashboardData(userId?: string) {
   
   try {
     // 1. Fetch user profile
-    const { data: profile } = await adminSupabase
+    const { data: profile, error: profileError } = await adminSupabase
       .from('profiles')
       .select('full_name, id')
       .eq('id', userId)
       .maybeSingle();
 
-    console.log('DEBUG: Dashboard Profile:', profile);
+    console.log('DEBUG: Fetching Profile for ID:', userId);
+    console.log('DEBUG: Profile Result:', profile);
+    if (profileError) console.error('DEBUG: Profile Error:', profileError);
 
     // 2. Fetch latest repo analysis
     const { data: latestRepo } = await adminSupabase
@@ -43,24 +45,40 @@ export async function getDashboardData(userId?: string) {
     const resumeAnalysis = latestResume?.analysis_result || {};
     const repoAnalysis = latestRepo?.analysis_result || {};
 
-    // Generate dynamic recommendations
-    const recommendations = [
-      ...(resumeAnalysis.suggestions?.slice(0, 1).map((s: string) => ({
-        title: "Resume Improvement",
-        desc: s,
+    // Generate dynamic recommendations based on REAL weaknesses and suggestions
+    const recommendations = [];
+
+    // 1. Weak Zone from Resume
+    if (resumeAnalysis.weakPoints && resumeAnalysis.weakPoints.length > 0) {
+      recommendations.push({
+        title: "Weak Zone Fix",
+        desc: resumeAnalysis.weakPoints[0],
+        icon: 'alert'
+      });
+    }
+
+    // 2. Strong Zone / Next Step
+    if (resumeAnalysis.suggestions && resumeAnalysis.suggestions.length > 0) {
+      recommendations.push({
+        title: "Strength Booster",
+        desc: resumeAnalysis.suggestions[0],
         icon: 'rocket'
-      })) || []),
-      ...(repoAnalysis.feedback?.slice(0, 1).map((f: string) => ({
-        title: "Code Optimization",
-        desc: f,
+      });
+    }
+
+    // 3. Code Feedback
+    if (repoAnalysis.feedback && repoAnalysis.feedback.length > 0) {
+      recommendations.push({
+        title: "Code Quality Tip",
+        desc: repoAnalysis.feedback[0],
         icon: 'zap'
-      })) || [])
-    ];
+      });
+    }
 
     if (recommendations.length === 0) {
       recommendations.push({
         title: "Get Started",
-        desc: "Upload your resume or link a repo to see custom tips.",
+        desc: "Upload your resume to see your weak and strong zones.",
         icon: 'rocket'
       });
     }
@@ -70,15 +88,16 @@ export async function getDashboardData(userId?: string) {
       userName: profile?.full_name?.split(' ')[0] || 'Developer',
       stats: {
         codeQuality: latestRepo?.score || "8.4",
-        skillProgress: 64,
-        roadmapTasks: "12/18",
+        skillProgress: Math.min(100, (resumeAnalysis.keywordsFound?.length || 0) * 8),
+        roadmapTasks: `${resumeAnalysis.keywordsFound?.length || 0} Skills`,
         atsScore: latestResume?.ats_score || "82",
       },
       skillDevelopment: [40, 70, 45, 90, 65, 80, 55],
-      recommendations,
+      recommendations: recommendations.slice(0, 3),
       goals: [
-        { label: "Improve ATS Score", progress: latestResume?.ats_score || 0 },
-        { label: "Code Quality Goal", progress: (latestRepo?.score || 0) * 10 }
+        { label: "ATS Optimization", progress: latestResume?.ats_score || 0 },
+        { label: "Skill Gap Coverage", progress: Math.min(100, (resumeAnalysis.keywordsFound?.length || 0) * 10) },
+        { label: "Code Quality", progress: (latestRepo?.score || 0) * 10 }
       ],
       recentActivity: activities?.map(a => ({
         time: formatTime(a.created_at),

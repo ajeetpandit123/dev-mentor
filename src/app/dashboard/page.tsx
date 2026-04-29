@@ -12,7 +12,8 @@ import {
   TrendingUp,
   AlertCircle,
   CheckCircle2,
-  Loader2
+  Loader2,
+  Zap
 } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -31,6 +32,7 @@ export default function DashboardPage() {
 
         const res = await fetch('/api/dashboard', { headers });
         const data = await res.json();
+        console.log('CLIENT DEBUG: Received Dashboard Data:', data);
         setData(data);
         setIsLoading(false);
       } catch (err) {
@@ -139,14 +141,20 @@ export default function DashboardPage() {
               <div className="bg-card border border-border rounded-2xl p-6">
                 <h3 className="font-bold mb-4">Top Recommendations</h3>
                 <div className="space-y-4">
-                  {dashboardData.recommendations.map((rec: any, i: number) => (
-                    <RecommendationItem 
-                      key={i}
-                      icon={rec.icon === 'rocket' ? Rocket : AlertCircle} 
-                      title={rec.title} 
-                      desc={rec.desc}
-                    />
-                  ))}
+                  {dashboardData.recommendations.map((rec: any, i: number) => {
+                    let Icon = AlertCircle;
+                    if (rec.icon === 'rocket') Icon = Rocket;
+                    if (rec.icon === 'zap') Icon = Zap;
+                    
+                    return (
+                      <RecommendationItem 
+                        key={i}
+                        icon={Icon} 
+                        title={rec.title} 
+                        desc={rec.desc}
+                      />
+                    );
+                  })}
                 </div>
               </div>
               <div className="bg-card border border-border rounded-2xl p-6">
