@@ -68,12 +68,32 @@ export async function analyzeRepository(repoUrl: string, userId?: string) {
 
     const combinedCode = fileContents.join('\n');
 
-    // 5. AI Analysis
-    console.log('Sending to Anthropic...');
+    // 5. Fetch User Settings for personalization
+    const adminSupabase = getServiceSupabase();
+    const { data: settings } = await adminSupabase
+      .from('user_settings')
+      .select('*')
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    const responseStyle = settings?.ai_response_style || 'mentor-style';
+    const explanationLevel = settings?.explanation_level || 'beginner-friendly';
+    const reviewDepth = settings?.review_depth || 'standard';
+    const focusAreas = settings?.focus_areas || ['clean code', 'performance'];
+    const techStack = settings?.tech_stack || 'MERN';
+
+    console.log('Sending to Anthropic with settings...');
     const prompt = `
       Analyze the following codebase from repository "${repo}".
       Provide a professional code review in JSON format.
       
+      USER PREFERENCES:
+      - Review Depth: ${reviewDepth}
+      - Focus Areas: ${focusAreas.join(', ')}
+      - Tech Stack Context: ${techStack}
+      - Response Tone: ${responseStyle}
+      - Explanation Detail: ${explanationLevel}
+
       Code Snippets:
       ${combinedCode.substring(0, 15000)}
 
@@ -90,6 +110,7 @@ export async function analyzeRepository(repoUrl: string, userId?: string) {
     const result = await callAnthropic(
       [{ role: "user", content: prompt }],
       "You are an elite AI Code Architect.",
+      undefined,
       { type: "json_object" }
     );
 

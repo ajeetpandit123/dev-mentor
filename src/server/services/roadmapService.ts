@@ -30,6 +30,7 @@ export async function generateLearningRoadmap(skills: string[], goals: string[],
     const result = await callAnthropic(
       [{ role: "user", content: prompt }],
       "You are an expert technical mentor.",
+      undefined,
       { type: "json_object" }
     );
 

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { supabase } from '@/lib/supabase';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -25,6 +26,8 @@ export default function ResumeAnalyzerPage() {
       setFile(e.target.files[0]);
     }
   };
+
+  const router = useRouter();
 
   const handleAnalyze = async () => {
     if (!file) return;
@@ -52,6 +55,11 @@ export default function ResumeAnalyzerPage() {
         data = await response.json();
       } catch (e) {
         throw new Error('Failed to parse server response');
+      }
+
+      if (data.error === 'LIMIT_REACHED') {
+        router.push('/pricing');
+        return;
       }
       
       if (!response.ok || data.error) {

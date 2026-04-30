@@ -24,6 +24,23 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'No valid file uploaded' }, { status: 400 });
     }
 
+    // 2. CHECK USAGE LIMIT (3 FREE TOKENS)
+    if (user) {
+      const { count, error: countError } = await supabase
+        .from('resumes')
+        .select('*', { count: 'exact', head: true })
+        .eq('user_id', user.id);
+
+      if (countError) {
+        console.warn('Usage limit check failed:', countError.message);
+      } else if (count !== null && count >= 3) {
+        return NextResponse.json({ 
+          error: 'LIMIT_REACHED', 
+          message: 'You have reached your limit of 3 free resume analyses.' 
+        }, { status: 403 });
+      }
+    }
+
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
 

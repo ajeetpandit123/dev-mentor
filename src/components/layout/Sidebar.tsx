@@ -13,7 +13,8 @@ import {
   LogOut,
   ChevronRight,
   User as UserIcon,
-  Loader2
+  Loader2,
+  Zap
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { motion } from 'framer-motion';
@@ -26,6 +27,7 @@ const menuItems = [
   { icon: FileText, label: 'Resume Analyzer', href: '/analyze/resume' },
   { icon: Map, label: 'Learning Roadmap', href: '/roadmap' },
   { icon: MessageSquare, label: 'AI Mentor', href: '/chat' },
+  { icon: Zap, label: 'Upgrade', href: '/pricing' },
 ];
 
 export function Sidebar() {

@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { supabase } from '@/lib/supabase';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -20,6 +21,7 @@ export default function RepoAnalysisPage() {
   const [url, setUrl] = useState('');
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<any>(null);
+  const router = useRouter();
 
   const handleAnalyze = async () => {
     if (!url) return;
@@ -48,6 +50,11 @@ export default function RepoAnalysisPage() {
       
       const data = await response.json();
       
+      if (data.error === 'LIMIT_REACHED') {
+        router.push('/pricing');
+        return;
+      }
+
       if (data.error) {
         alert(data.error);
         return;

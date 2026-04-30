@@ -8,10 +8,28 @@ export async function analyzeResume(fileBuffer: Buffer, userId?: string) {
     const data = await pdf(fileBuffer);
     const resumeText = data.text;
 
-    // 2. AI Analysis
+    // 2. Fetch User Settings for personalization
+    const adminSupabase = getServiceSupabase();
+    const { data: settings } = await adminSupabase
+      .from('user_settings')
+      .select('*')
+      .eq('user_id', userId)
+      .maybeSingle();
+
+    const responseStyle = settings?.ai_response_style || 'mentor-style';
+    const explanationLevel = settings?.explanation_level || 'beginner-friendly';
+    const atsStrict = settings?.ats_strict || false;
+    const targetKeywords = settings?.keywords || [];
+
     const prompt = `
       Analyze the following resume text for ATS compatibility and professional quality.
       
+      USER PREFERENCES:
+      - Tone/Style: ${responseStyle}
+      - Complexity Level: ${explanationLevel}
+      - ATS Strictness: ${atsStrict ? 'High (Strict)' : 'Standard'}
+      - Target Keywords: ${targetKeywords.join(', ')}
+
       Resume Text:
       ${resumeText}
 
@@ -29,6 +47,7 @@ export async function analyzeResume(fileBuffer: Buffer, userId?: string) {
     const result = await callAnthropic(
       [{ role: "user", content: prompt }],
       "You are an expert career coach and ATS specialist.",
+      undefined,
       { type: "json_object" }
     );
 
