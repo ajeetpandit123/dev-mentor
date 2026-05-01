@@ -20,6 +20,23 @@ export default function ResumeAnalyzerPage() {
   const [file, setFile] = useState<File | null>(null);
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<any>(null);
+  const [tokens, setTokens] = useState<number | null>(null);
+
+  React.useEffect(() => {
+    fetchTokens();
+  }, []);
+
+  const fetchTokens = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data } = await supabase
+        .from('profiles')
+        .select('analysis_tokens')
+        .eq('id', user.id)
+        .single();
+      setTokens(data?.analysis_tokens ?? 0);
+    }
+  };
 
   const handleUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
@@ -72,6 +89,7 @@ export default function ResumeAnalyzerPage() {
       alert(err.message || 'Failed to analyze resume');
     } finally {
       setIsAnalyzing(false);
+      fetchTokens();
     }
   };
 
@@ -80,7 +98,15 @@ export default function ResumeAnalyzerPage() {
       <div className="max-w-4xl mx-auto space-y-8">
         <div>
           <h1 className="text-3xl font-bold mb-2">Resume AI Analyzer</h1>
-          <p className="text-muted-foreground">Upload your resume to get ATS optimization tips and skill gap analysis.</p>
+          <div className="flex items-center justify-between">
+            <p className="text-muted-foreground">Upload your resume to get ATS optimization tips and skill gap analysis.</p>
+            {tokens !== null && (
+              <div className="flex items-center gap-2 bg-primary/10 px-4 py-1.5 rounded-full border border-primary/20">
+                <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+                <span className="text-xs font-bold text-primary">{tokens} Free Tokens Left</span>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Upload Box */}
@@ -113,9 +139,22 @@ export default function ResumeAnalyzerPage() {
             {file && !isAnalyzing && (
               <button 
                 onClick={handleAnalyze}
-                className="bg-primary text-primary-foreground px-6 py-2 rounded-lg font-bold hover:opacity-90"
+                disabled={tokens !== null && tokens <= 0}
+                className={`px-6 py-2 rounded-lg font-bold transition-all ${
+                  tokens !== null && tokens <= 0 
+                    ? 'bg-muted text-muted-foreground cursor-not-allowed' 
+                    : 'bg-primary text-primary-foreground hover:opacity-90 shadow-lg shadow-primary/20'
+                }`}
               >
-                Start Analysis
+                {tokens !== null && tokens <= 0 ? 'Limit Reached' : 'Start Analysis'}
+              </button>
+            )}
+            {tokens !== null && tokens <= 0 && (
+              <button 
+                onClick={() => router.push('/pricing')}
+                className="bg-green-500 text-white px-6 py-2 rounded-lg font-bold hover:bg-green-600 transition-colors shadow-lg shadow-green-500/20"
+              >
+                Upgrade Now
               </button>
             )}
           </div>

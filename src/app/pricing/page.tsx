@@ -1,13 +1,95 @@
 'use client';
 
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { motion } from 'framer-motion';
-import { Check, Zap, Crown, ShieldCheck } from 'lucide-react';
+import { Check, Zap, Crown, ShieldCheck, Loader2 } from 'lucide-react';
 import { useRouter } from 'next/navigation';
+import { supabase } from '@/lib/supabase';
+
+declare global {
+  interface Window {
+    Razorpay: any;
+  }
+}
 
 export default function PricingPage() {
   const router = useRouter();
+  const [user, setUser] = useState<any>(null);
+  const [isProcessing, setIsProcessing] = useState<string | null>(null);
+
+  useEffect(() => {
+    const getUser = async () => {
+      const { data: { user } } = await supabase.auth.getUser();
+      setUser(user);
+    };
+    getUser();
+  }, []);
+
+  const handlePayment = async (plan: string, amount: number) => {
+    if (!user) {
+      router.push('/login');
+      return;
+    }
+
+    setIsProcessing(plan);
+    try {
+      // 1. Create Order
+      const res = await fetch('/api/create-razorpay-order', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount, plan }),
+      });
+      const order = await res.json();
+
+      if (order.error) throw new Error(order.error);
+
+      // 2. Open Razorpay Checkout
+      const options = {
+        key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, 
+        amount: order.amount,
+        currency: order.currency,
+        name: "DevMentor AI",
+        description: `Upgrade to ${plan} Plan`,
+        order_id: order.id,
+        handler: async function (response: any) {
+          // 3. Verify Payment
+          const verifyRes = await fetch('/api/verify-payment', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              ...response,
+              plan,
+              userId: user.id
+            }),
+          });
+          const verifyData = await verifyRes.json();
+
+          if (verifyData.success) {
+            alert('🎉 Payment successful! Your account has been upgraded.');
+            router.push('/dashboard');
+            router.refresh();
+          } else {
+            alert('❌ Payment verification failed. Please contact support.');
+          }
+        },
+        prefill: {
+          email: user.email,
+        },
+        theme: {
+          color: "#7c3aed",
+        },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch (error: any) {
+      console.error('Payment Error:', error);
+      alert('Failed to initiate payment: ' + error.message);
+    } finally {
+      setIsProcessing(null);
+    }
+  };
 
   return (
     <DashboardLayout>
@@ -26,12 +108,11 @@ export default function PricingPage() {
             transition={{ delay: 0.1 }}
             className="text-xl text-muted-foreground"
           >
-            You've reached your free limit. Choose a plan that fits your ambition.
+            Unlock unlimited AI power and accelerated career growth.
           </motion.p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-8">
-          {/* Free Plan */}
           <PricingCard
             title="Free"
             price="$0"
@@ -46,7 +127,6 @@ export default function PricingPage() {
             disabled={true}
           />
 
-          {/* Pro Plan */}
           <PricingCard
             title="Pro"
             price="$19"
@@ -55,17 +135,17 @@ export default function PricingPage() {
             features={[
               "Unlimited Repository Analyses",
               "Unlimited Resume Scans",
-              "Advanced AI Mentor (Opus & Sonnet 3.5)",
+              "Advanced AI Mentor",
               "Personalized 30-Day Roadmaps",
               "Detailed PDF Reports",
               "Priority Support"
             ]}
             highlight={true}
-            buttonText="Upgrade to Pro"
-            onClick={() => alert('Payment gateway integration coming soon!')}
+            buttonText={isProcessing === 'Pro' ? "Processing..." : "Upgrade to Pro"}
+            loading={isProcessing === 'Pro'}
+            onClick={() => handlePayment('Pro', 19)}
           />
 
-          {/* Enterprise Plan */}
           <PricingCard
             title="Lifetime"
             price="$99"
@@ -78,15 +158,16 @@ export default function PricingPage() {
               "Custom Skill Tracking",
               "No Monthly Subscription"
             ]}
-            buttonText="Get Lifetime Access"
-            onClick={() => alert('Payment gateway integration coming soon!')}
+            buttonText={isProcessing === 'Lifetime' ? "Processing..." : "Get Lifetime Access"}
+            loading={isProcessing === 'Lifetime'}
+            onClick={() => handlePayment('Lifetime', 99)}
           />
         </div>
 
         <div className="mt-16 text-center">
           <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full text-xs text-muted-foreground">
             <ShieldCheck className="w-4 h-4 text-primary" />
-            Secure payments handled by Stripe. Cancel anytime.
+            Secure payments handled by Razorpay. SSL Encrypted.
           </div>
         </div>
       </div>
@@ -103,6 +184,7 @@ interface PricingCardProps {
   highlight?: boolean;
   buttonText: string;
   disabled?: boolean;
+  loading?: boolean;
   onClick?: () => void;
 }
 
@@ -115,6 +197,7 @@ function PricingCard({
   highlight, 
   buttonText, 
   disabled,
+  loading,
   onClick 
 }: PricingCardProps) {
   return (
@@ -127,7 +210,7 @@ function PricingCard({
       }`}
     >
       {highlight && (
-        <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground px-4 py-1 rounded-full text-xs font-bold flex items-center gap-1">
+        <div className="absolute -top-4 left-1/2 -translate-x-1/2 bg-primary text-primary-foreground px-4 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-lg">
           <Crown className="w-3 h-3" /> Most Popular
         </div>
       )}
@@ -154,8 +237,8 @@ function PricingCard({
 
       <button
         onClick={onClick}
-        disabled={disabled}
-        className={`w-full py-4 rounded-xl font-bold transition-all active:scale-95 ${
+        disabled={disabled || loading}
+        className={`w-full py-4 rounded-xl font-bold transition-all active:scale-95 flex items-center justify-center gap-2 ${
           disabled
             ? 'bg-white/5 text-muted-foreground cursor-not-allowed border border-white/10'
             : highlight
@@ -163,6 +246,7 @@ function PricingCard({
               : 'bg-white text-black hover:bg-white/90'
         }`}
       >
+        {loading && <Loader2 className="w-4 h-4 animate-spin" />}
         {buttonText}
       </button>
     </motion.div>

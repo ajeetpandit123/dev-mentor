@@ -4,6 +4,8 @@ create table profiles (
   email text unique,
   full_name text,
   avatar_url text,
+  plan text default 'Free',
+  analysis_tokens integer default 3,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
@@ -108,3 +110,14 @@ $$ language plpgsql security definer;
 create trigger on_auth_user_created
   after insert on auth.users
   for each row execute procedure public.handle_new_user();
+
+-- Function to decrement tokens safely
+create or replace function decrement_tokens(user_id uuid)
+returns void as $$
+begin
+  update profiles
+  set analysis_tokens = analysis_tokens - 1
+  where id = user_id and analysis_tokens > 0;
+end;
+$$ language plpgsql security definer;
+

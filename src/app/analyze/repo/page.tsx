@@ -22,6 +22,23 @@ export default function RepoAnalysisPage() {
   const [isAnalyzing, setIsAnalyzing] = useState(false);
   const [result, setResult] = useState<any>(null);
   const router = useRouter();
+  const [tokens, setTokens] = useState<number | null>(null);
+
+  React.useEffect(() => {
+    fetchTokens();
+  }, []);
+
+  const fetchTokens = async () => {
+    const { data: { user } } = await supabase.auth.getUser();
+    if (user) {
+      const { data } = await supabase
+        .from('profiles')
+        .select('analysis_tokens')
+        .eq('id', user.id)
+        .single();
+      setTokens(data?.analysis_tokens ?? 0);
+    }
+  };
 
   const handleAnalyze = async () => {
     if (!url) return;
@@ -66,6 +83,7 @@ export default function RepoAnalysisPage() {
       alert('Failed to analyze repository');
     } finally {
       setIsAnalyzing(false);
+      fetchTokens();
     }
   };
 
@@ -74,7 +92,15 @@ export default function RepoAnalysisPage() {
       <div className="max-w-4xl mx-auto space-y-8">
         <div>
           <h1 className="text-3xl font-bold mb-2">GitHub Repository Analysis</h1>
-          <p className="text-muted-foreground">Enter a public repository URL to get an AI-powered code review.</p>
+          <div className="flex items-center justify-between">
+            <p className="text-muted-foreground">Enter a public repository URL to get an AI-powered code review.</p>
+            {tokens !== null && (
+              <div className="flex items-center gap-2 bg-primary/10 px-4 py-1.5 rounded-full border border-primary/20">
+                <div className="w-2 h-2 bg-primary rounded-full animate-pulse" />
+                <span className="text-xs font-bold text-primary">{tokens} Free Tokens Left</span>
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Search Bar */}
@@ -92,15 +118,23 @@ export default function RepoAnalysisPage() {
             />
             <button 
               onClick={handleAnalyze}
-              disabled={isAnalyzing || !url}
+              disabled={isAnalyzing || !url || (tokens !== null && tokens <= 0)}
               className="absolute right-2 top-1/2 -translate-y-1/2 bg-primary text-primary-foreground px-6 py-2 rounded-lg font-bold disabled:opacity-50 flex items-center gap-2"
             >
               {isAnalyzing ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-              Analyze
+              {tokens !== null && tokens <= 0 ? 'Limit Reached' : 'Analyze'}
             </button>
           </div>
-          <p className="text-xs text-muted-foreground flex items-center gap-1">
-            <ShieldCheck className="w-3 h-3" /> We only read public data and code structure.
+          <p className="text-xs text-muted-foreground flex items-center justify-between">
+            <span className="flex items-center gap-1"><ShieldCheck className="w-3 h-3" /> We only read public data and code structure.</span>
+            {tokens !== null && tokens <= 0 && (
+              <button 
+                onClick={() => router.push('/pricing')}
+                className="text-primary font-bold hover:underline"
+              >
+                Upgrade to get more tokens →
+              </button>
+            )}
           </p>
         </div>
 

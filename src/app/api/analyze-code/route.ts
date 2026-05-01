@@ -24,23 +24,32 @@ export async function POST(req: NextRequest) {
     }
 
     // 2. CHECK USAGE LIMIT (3 FREE TOKENS)
-    if (user) {
-      const { count, error: countError } = await supabase
-        .from('projects')
-        .select('*', { count: 'exact', head: true })
-        .eq('user_id', user.id);
+    if (!user) {
+      return NextResponse.json({ error: 'Authentication required for analysis' }, { status: 401 });
+    }
 
-      if (countError) {
-        console.warn('Usage limit check failed:', countError.message);
-      } else if (count !== null && count >= 3) {
-        return NextResponse.json({ 
-          error: 'LIMIT_REACHED', 
-          message: 'You have reached your limit of 3 free repository analyses.' 
-        }, { status: 403 });
-      }
+    const { data: profile, error: profileError } = await supabase
+      .from('profiles')
+      .select('analysis_tokens')
+      .eq('id', user.id)
+      .single();
+
+    if (profileError) {
+      console.warn('Profile fetch failed:', profileError.message);
+    } else if (!profile || profile.analysis_tokens === null || profile.analysis_tokens <= 0) {
+      return NextResponse.json({ 
+        error: 'LIMIT_REACHED', 
+        message: 'You have reached your limit of free analyses. Please upgrade to continue.' 
+      }, { status: 403 });
     }
 
     const analysis = await analyzeRepository(repoUrl, user?.id);
+
+    // 3. DECREMENT TOKEN
+    if (user) {
+      await supabase.rpc('decrement_tokens', { user_id: user.id });
+    }
+
     return NextResponse.json(analysis);
   } catch (error: any) {
     console.error('API Error:', error);
