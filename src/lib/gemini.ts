@@ -1,61 +1,45 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 
+/**
+ * Handles communication with Google's Gemini models.
+ * Optimized for Gemini 2.5 Flash for high-speed technical mentorship.
+ * 
+ * @param messages - Array of chat messages
+ * @param system - System-level instructions
+ * @param modelName - Defaults to gemini-2.5-flash as per environment
+ */
 export async function callGemini(
   messages: { role: string; content: string }[],
   system?: string,
-  modelName: string = 'gemini-2.0-flash',
-  triedModels: string[] = []
+  modelName: string = process.env.GEMINI_MODEL || 'gemini-2.5-flash'
 ) {
   const apiKey = process.env.GOOGLE_API_KEY?.trim().replace(/^["']|["']$/g, '');
   
   if (!apiKey) {
-    throw new Error('GOOGLE_API_KEY is missing in environment variables');
+    throw new Error('GOOGLE_API_KEY is missing');
   }
 
   const genAI = new GoogleGenerativeAI(apiKey);
   
   try {
-    const model = genAI.getGenerativeModel({ 
-      model: modelName,
-      systemInstruction: system
-    });
+    // Using Stable v1 API for Gemini 2.5
+    const model = genAI.getGenerativeModel(
+      { model: modelName },
+      { apiVersion: 'v1' }
+    );
 
-    console.log(`[Gemini SDK] Using model: ${modelName}`);
-
-    // Convert messages to Gemini format
-    const history = messages.slice(0, -1).map(m => ({
-      role: m.role === 'assistant' ? 'model' : 'user',
-      parts: [{ text: m.content }]
-    }));
+    console.log(`[Gemini SDK] Using Gemini 2.5 Flash: ${modelName}`);
 
     const lastMessage = messages[messages.length - 1].content;
+    const combinedPrompt = system 
+      ? `Instructions: ${system}\n\nUser Input: ${lastMessage}` 
+      : lastMessage;
 
-    const chat = model.startChat({
-      history: history,
-    });
-
-    const result = await chat.sendMessage(lastMessage);
+    const result = await model.generateContent(combinedPrompt);
     const response = await result.response;
     return response.text();
   } catch (error: any) {
-    // Check for Quota or Not Found errors
-    const errorMessage = error.message || '';
-    if (errorMessage.includes('429') || errorMessage.includes('quota') || errorMessage.includes('404')) {
-      const fallbacks = [
-        'gemini-1.5-flash',
-        'gemini-1.5-pro',
-        'gemini-pro'
-      ];
-
-      const nextFallback = fallbacks.find(f => f !== modelName && !triedModels.includes(f));
-      
-      if (nextFallback) {
-        console.warn(`[Gemini SDK] Model ${modelName} failed/quota exceeded. Trying fallback: ${nextFallback}`);
-        return callGemini(messages, system, nextFallback, [...triedModels, modelName]);
-      }
-    }
-
-    console.error('Gemini SDK Error:', error);
-    throw new Error(`Gemini API Error: ${error.message || JSON.stringify(error)}`);
+    console.error(`[Gemini SDK] Error with ${modelName}:`, error.message);
+    throw error;
   }
 }

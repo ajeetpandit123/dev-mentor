@@ -1,6 +1,11 @@
-import { callAnthropic } from '@/lib/anthropic';
-import { supabase } from '@/lib/supabase';
+import { callSmartAI } from './aiService';
+import { getServiceSupabase } from '@/lib/supabase';
 
+/**
+ * Roadmap Service
+ * 
+ * Generates personalized learning paths using Gemini 2.5 Flash.
+ */
 export async function generateLearningRoadmap(skills: string[], goals: string[], currentLevel: string) {
   try {
     const prompt = `
@@ -8,41 +13,26 @@ export async function generateLearningRoadmap(skills: string[], goals: string[],
       Current Skills: ${skills.join(', ')}
       Target Goals: ${goals.join(', ')}
       Experience Level: ${currentLevel}
-
-      Return a structured JSON roadmap:
-      {
-        "weeks": [
-          {
-            "week": number,
-            "title": string,
-            "topics": string[],
-            "miniProject": {
-              "title": string,
-              "description": string
-            },
-            "resources": string[]
-          }
-        ],
-        "summary": string
-      }
+      Return JSON: { "weeks": [{ "week": number, "title": string, "topics": string[], "miniProject": { "title": string, "description": string }, "resources": string[] }], "summary": string }
     `;
 
-    const result = await callAnthropic(
+    const result = await callSmartAI(
       [{ role: "user", content: prompt }],
       "You are an expert technical mentor.",
-      undefined,
-      { type: "json_object" }
+      { 
+        response_format: { type: "json_object" }
+      }
     );
 
-    // 3. Save activity (Optional)
     try {
-      await supabase.from('activities').insert({
+      const adminSupabase = getServiceSupabase();
+      await adminSupabase.from('activities').insert({
         title: 'New Roadmap Generated',
         description: `Learning path for ${goals[0] || 'your goals'} started`,
         type: 'roadmap'
       });
     } catch (dbError) {
-      console.warn('Could not save to database:', dbError);
+      console.warn('DB Save Error:', dbError);
     }
 
     return result;

@@ -38,6 +38,14 @@ export default function AdvancedSettingsPage() {
   const [isSaving, setIsSaving] = React.useState(false);
   const [toast, setToast] = React.useState<{message: string, type: 'success' | 'error'} | null>(null);
   
+  /**
+   * Main Settings State
+   * 
+   * This object manages all user preferences across three main areas:
+   * 1. Profile: Public-facing info (name, email).
+   * 2. Career Settings: Technical background (role, stack, experience).
+   * 3. AI Preferences: How the mentor should respond (tone, depth).
+   */
   const [data, setData] = React.useState<any>({
     profile: { full_name: '', email: '' },
     settings: {
@@ -71,6 +79,13 @@ export default function AdvancedSettingsPage() {
   }, [data?.settings?.theme]);
 
   React.useEffect(() => {
+    /**
+     * Settings Loader
+     * 
+     * 1. Fetches the current session to ensure authorization.
+     * 2. Calls the /api/settings endpoint.
+     * 3. Merges existing default state with user-specific data from the DB.
+     */
     async function loadSettings() {
       try {
         const { data: { session } } = await supabase.auth.getSession();
@@ -94,6 +109,14 @@ export default function AdvancedSettingsPage() {
     loadSettings();
   }, []);
 
+  /**
+   * Save Handler
+   * 
+   * Updates the user's data in a multi-table transaction:
+   * 1. Updates 'profiles' (Name/Email).
+   * 2. Updates 'user_settings' (All AI and Career preferences).
+   * 3. Provides visual feedback via a toast notification.
+   */
   const handleSave = async () => {
     setIsSaving(true);
     try {
@@ -366,7 +389,7 @@ export default function AdvancedSettingsPage() {
                         label="ATS Strict Mode" 
                         desc="Harsher grading for enterprise-grade ATS compatibility." 
                         enabled={data.settings.ats_strict}
-                        onToggle={(v) => updateSettings({ats_strict: v})}
+                        onToggle={(v: boolean) => updateSettings({ats_strict: v})}
                       />
                       <InputGroup label="Target Keywords">
                         <textarea 
@@ -389,13 +412,13 @@ export default function AdvancedSettingsPage() {
                         label="Save GitHub Data" 
                         desc="Keep analysis history of your repositories." 
                         enabled={data.settings.save_github}
-                        onToggle={(v) => updateSettings({save_github: v})}
+                        onToggle={(v: boolean) => updateSettings({save_github: v})}
                       />
                       <ToggleItem 
                         label="Save Resume Data" 
                         desc="Store your resume analysis for the dashboard." 
                         enabled={data.settings.save_resume}
-                        onToggle={(v) => updateSettings({save_resume: v})}
+                        onToggle={(v: boolean) => updateSettings({save_resume: v})}
                       />
                       
                       <div className="pt-8 border-t border-border">
@@ -445,7 +468,7 @@ export default function AdvancedSettingsPage() {
                         label="UI Animations" 
                         desc="Enable smooth motion effects across the platform." 
                         enabled={data.settings.animations_enabled}
-                        onToggle={(v) => updateSettings({animations_enabled: v})}
+                        onToggle={(v: boolean) => updateSettings({animations_enabled: v})}
                       />
                     </div>
                   </div>
