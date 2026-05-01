@@ -31,9 +31,66 @@ export default function DashboardPage() {
         }
 
         const res = await fetch('/api/dashboard', { headers });
-        const data = await res.json();
-        console.log('CLIENT DEBUG: Received Dashboard Data:', data);
-        setData(data);
+        const apiData = await res.json();
+        
+        // --- REAL-TIME ROADMAP SYNC (Access the Real) ---
+        let skillProgress = apiData.stats?.skillProgress || 64;
+        let roadmapTasks = apiData.stats?.roadmapTasks || "12/18";
+        let skillDevelopment = [0, 0, 0, 0, 0, 0, 0]; 
+
+        let roadmapData = null;
+        
+        try {
+          // 1. Try DB Sync first
+          const userId = session?.user?.id;
+          if (userId) {
+            const dbRes = await fetch(`/api/roadmap?userId=${userId}`);
+            const dbData = await dbRes.json();
+            if (dbData && dbData.roadmap_json) {
+              roadmapData = dbData.roadmap_json;
+            }
+          }
+
+          // 2. Fallback to cache if DB empty
+          if (!roadmapData) {
+            const cached = localStorage.getItem('dev_monitor_roadmap');
+            if (cached) roadmapData = JSON.parse(cached);
+          }
+
+          if (roadmapData) {
+            const steps = roadmapData.steps || [];
+            const totalTopics = steps.reduce((acc: number, s: any) => acc + (s.topics?.length || 0), 0);
+            const completedTopics = steps.reduce((acc: number, s: any) => acc + (s.completedTopics?.length || 0), 0);
+            const totalWeeks = steps.length;
+            const completedWeeks = steps.filter((s: any) => s.status === 'completed').length;
+
+            if (totalTopics > 0) {
+              skillProgress = Math.round((completedTopics / totalTopics) * 100);
+              roadmapTasks = `${completedWeeks}/${totalWeeks} Weeks`;
+            }
+
+            if (roadmapData.history) {
+              skillDevelopment = roadmapData.history;
+            } else {
+              const day = (new Date().getDay() + 6) % 7;
+              skillDevelopment[day] = skillProgress;
+            }
+          }
+        } catch (e) {
+          console.error('Failed to sync roadmap data for dashboard', e);
+        }
+
+        const mergedData = {
+          ...apiData,
+          stats: {
+            ...apiData.stats,
+            skillProgress,
+            roadmapTasks
+          },
+          skillDevelopment
+        };
+
+        setData(mergedData);
         setIsLoading(false);
       } catch (err) {
         console.error('Failed to fetch dashboard:', err);
@@ -55,16 +112,10 @@ export default function DashboardPage() {
 
   const dashboardData = data || {
     userName: 'Developer',
-    stats: { codeQuality: "8.4", skillProgress: 64, roadmapTasks: "12/18", atsScore: 82 },
-    skillDevelopment: [40, 70, 45, 90, 65, 80, 55],
-    recommendations: [
-      { title: "Master Next.js Middleware", desc: "Your last project lacked edge functions.", icon: 'rocket' },
-      { title: "Optimize SQL Queries", desc: "Performance score was low.", icon: 'alert' }
-    ],
-    goals: [
-      { label: "Complete Docker Basics", progress: 75 },
-      { label: "Refactor Resume", progress: 30 }
-    ],
+    stats: { codeQuality: "0.0", skillProgress: 0, roadmapTasks: "0/0 Weeks", atsScore: 0 },
+    skillDevelopment: [0, 0, 0, 0, 0, 0, 0],
+    recommendations: [],
+    goals: [],
     recentActivity: []
   };
 
@@ -121,15 +172,21 @@ export default function DashboardPage() {
                   <BarChart3 className="text-primary w-5 h-5" /> Skill Development
                 </h3>
               </div>
-              <div className="flex-1 flex items-end gap-4 px-4">
-                {dashboardData.skillDevelopment.map((h: number, i: number) => (
-                  <div key={i} className="flex-1 flex flex-col items-center gap-2">
-                    <motion.div 
-                      initial={{ height: 0 }}
-                      animate={{ height: `${h}%` }}
-                      className="w-full bg-primary/20 hover:bg-primary/40 rounded-t-lg border-x border-t border-primary/30 transition-colors cursor-pointer"
-                    />
-                    <span className="text-[10px] text-muted-foreground font-medium uppercase">
+              <div className="flex-1 flex items-end gap-4 px-4 pb-4 h-[300px]">
+                {(dashboardData.skillDevelopment || [45, 75, 55, 95, 65, 85, 45]).map((h: number, i: number) => (
+                  <div key={i} className="flex-1 flex flex-col items-center gap-4 h-full">
+                    <div className="flex-1 w-full flex items-end justify-center relative">
+                      <motion.div 
+                        initial={{ height: 0 }}
+                        animate={{ height: `${Math.max(h, 5)}%` }}
+                        className="w-full bg-gradient-to-t from-primary/60 via-primary to-purple-400 rounded-t-xl border-x border-t border-white/20 shadow-[0_0_15px_rgba(168,85,247,0.3)] transition-all cursor-pointer relative group"
+                      >
+                        <div className="absolute -top-10 left-1/2 -translate-x-1/2 bg-popover border border-border text-foreground text-[10px] font-bold px-3 py-1.5 rounded-xl opacity-0 group-hover:opacity-100 transition-all shadow-xl whitespace-nowrap z-50">
+                          {h}% Mastered
+                        </div>
+                      </motion.div>
+                    </div>
+                    <span className="text-[10px] text-muted-foreground font-black uppercase tracking-tighter">
                       {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'][i]}
                     </span>
                   </div>

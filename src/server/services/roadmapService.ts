@@ -13,7 +13,21 @@ export async function generateLearningRoadmap(skills: string[], goals: string[],
       Current Skills: ${skills.join(', ')}
       Target Goals: ${goals.join(', ')}
       Experience Level: ${currentLevel}
-      Return JSON: { "weeks": [{ "week": number, "title": string, "topics": string[], "miniProject": { "title": string, "description": string }, "resources": string[] }], "summary": string }
+      Return JSON: { 
+        "weeks": [{ 
+          "week": number, 
+          "title": string, 
+          "topics": string[], 
+          "miniProject": { 
+            "title": string, 
+            "description": string,
+            "features": string[],
+            "techStack": string[]
+          }, 
+          "resources": string[] 
+        }], 
+        "summary": string 
+      }
     `;
 
     const result = await callSmartAI(

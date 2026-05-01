@@ -56,7 +56,20 @@ const MarkdownMessage = ({ content, role }: { content: string, role: string }) =
   );
 };
 
+import { useSearchParams } from 'next/navigation';
+
 export default function ChatMentorPage() {
+  return (
+    <React.Suspense fallback={<DashboardLayout><div className="flex items-center justify-center h-full text-muted-foreground animate-pulse font-bold uppercase tracking-widest">Initialising AI Mentor...</div></DashboardLayout>}>
+      <ChatContent />
+    </React.Suspense>
+  );
+}
+
+function ChatContent() {
+  const searchParams = useSearchParams();
+  const initialPrompt = searchParams.get('prompt');
+
   const [messages, setMessages] = useState<Message[]>([]);
   const [sessions, setSessions] = useState<ChatSession[]>([]);
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
@@ -67,6 +80,29 @@ export default function ChatMentorPage() {
   const [attachedFile, setAttachedFile] = useState<{name: string, content: string} | null>(null);
   
   const [emojiCategory, setEmojiCategory] = useState('smilies');
+
+  const hasInitiatedRef = useRef(false);
+
+  // Load Sessions and Initial Chat
+  useEffect(() => {
+    loadSessions();
+    
+    if (initialPrompt && !hasInitiatedRef.current) {
+      hasInitiatedRef.current = true;
+      handleInitialPrompt(initialPrompt);
+    }
+  }, [initialPrompt]);
+
+  const handleInitialPrompt = async (prompt: string) => {
+    // We need to wait for auth session or handle it in handleSend
+    // For simplicity, we just set the input and call handleSend after a short delay or just call a modified version
+    setInput(prompt);
+    // Since handleSend depends on input state, we might need a small timeout or a direct call
+    setTimeout(() => {
+      const sendBtn = document.getElementById('send-message-btn');
+      sendBtn?.click();
+    }, 500);
+  };
   
   const EMOJI_DATA: any = {
     smilies: ['😀','😃','😄','😁','😅','😂','🤣','😊','😇','🙂','🙃','😉','😌','😍','🥰','😘','😗','😙','😚','😋','😛','😝','😜','🤪','🤨','🧐','🤓','😎','🤩','🥳','😏','😒','😞','😔','😟','😕','🙁','☹️','😣','😖','😫','😩','🥺','😢','😭','😤','😠','😡','🤬','🤯','😳','🥵','🥶','😱','😨','😰','😥','😓','🤗','🤔','🤭','🤫','🤥','😶','😐','😑','😬','🙄','😯','😦','😧','😮','😲','🥱','😴','🤤','😪','😵','🤐','🥴','🤢','🤮','🤧','😷','🤒','🤕','🤑','🤠','😈','👿','👹','👺','🤡','👻','💀','☠️','👽','👾','🤖','💩','😺','😸','😹','😻','😼','😽','🙀','😿','😾'],
@@ -446,6 +482,7 @@ export default function ChatMentorPage() {
                   )}
                 </AnimatePresence>
                 <button 
+                  id="send-message-btn"
                   onClick={handleSend}
                   disabled={(!input.trim() && !attachedFile) || isLoading}
                   className="w-11 h-11 bg-primary text-white rounded-xl flex items-center justify-center hover:shadow-[0_0_20px_rgba(var(--primary-rgb),0.4)] disabled:opacity-30 transition-all"
