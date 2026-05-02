@@ -51,7 +51,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
         {/* Mobile Header */}
         <div className="flex items-center justify-between lg:hidden p-4 sticky top-0 z-[60] bg-background/80 backdrop-blur-xl border-b border-white/5">
           <Link href="/dashboard">
-            <img src="/logo.png" alt="DevIntel" className="h-8 w-auto" />
+            <img src="/logo.png" alt="DevIntel" className="h-16 sm:h-20 w-auto" />
           </Link>
           <div className="flex items-center gap-4">
             <button className="relative p-2 rounded-xl hover:bg-white/5 transition-all">

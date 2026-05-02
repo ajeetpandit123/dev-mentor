@@ -60,7 +60,7 @@ export default function LoginPage() {
       >
         <div className="text-center mb-8">
           <Link href="/" className="inline-block mb-8">
-            <img src="/logo.png" alt="DevIntel" className="h-12 w-auto mx-auto" />
+            <img src="/logo.png" alt="DevIntel" className="h-32 md:h-40 w-auto mx-auto" />
           </Link>
           <h1 className="text-3xl font-bold">Welcome back</h1>
           <p className="text-muted-foreground mt-2">Continue your professional growth journey.</p>

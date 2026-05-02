@@ -6,6 +6,9 @@ create table profiles (
   avatar_url text,
   plan text default 'Free',
   analysis_tokens integer default 3,
+  career_goal text default 'Full Stack',
+  skill_level text default 'Intermediate',
+  notifications_enabled boolean default true,
   created_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 

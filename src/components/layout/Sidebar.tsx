@@ -40,7 +40,8 @@ export function Sidebar() {
   React.useEffect(() => {
     async function getProfile() {
       try {
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { session } } = await supabase.auth.getSession();
+        const user = session?.user;
         if (user) {
           setUser(user);
           const { data: profile } = await supabase
@@ -67,7 +68,7 @@ export function Sidebar() {
     <div className="hidden lg:flex w-64 h-screen bg-card border-r border-border flex-col p-4">
       <div className="px-2 mb-8">
         <Link href="/dashboard" className="block">
-          <img src="/logo.png" alt="DevIntel" className="h-10 w-auto" />
+          <img src="/logo.png" alt="DevIntel" className="h-16 md:h-24 lg:h-32 w-auto" />
         </Link>
       </div>
 

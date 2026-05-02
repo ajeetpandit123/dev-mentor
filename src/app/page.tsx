@@ -21,7 +21,7 @@ export default function LandingPage() {
       <nav className="fixed top-0 w-full z-50 border-b border-white/10 glass">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
           <Link href="/" className="block">
-            <img src="/logo.png" alt="DevIntel" className="h-8 w-auto" />
+            <img src="/logo.png" alt="DevIntel" className="h-20 md:h-28 w-auto" />
           </Link>
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
             <Link href="#features" className="hover:text-foreground transition-colors">Features</Link>

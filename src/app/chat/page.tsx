@@ -308,8 +308,8 @@ function ChatContent() {
           <div className="relative group bg-card/40 backdrop-blur-xl border border-white/10 rounded-t-3xl p-6 flex items-center justify-between shadow-2xl z-30">
             <div className="flex items-center gap-4">
               <div className="relative">
-                <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center overflow-hidden shadow-lg p-1">
-                  <img src="/logo.png" alt="DevIntel" className="w-full h-auto object-contain" />
+                <div className="h-20 md:h-24 lg:h-32 flex items-center">
+                  <img src="/logo.png" alt="DevIntel" className="h-full w-auto object-contain" />
                 </div>
                 <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 border-4 border-[#0a0a0a] rounded-full" />
               </div>

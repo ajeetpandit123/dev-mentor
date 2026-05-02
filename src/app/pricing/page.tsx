@@ -19,11 +19,11 @@ export default function PricingPage() {
   const [isProcessing, setIsProcessing] = useState<string | null>(null);
 
   useEffect(() => {
-    const getUser = async () => {
-      const { data: { user } } = await supabase.auth.getUser();
-      setUser(user);
+    const getUserData = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setUser(session?.user ?? null);
     };
-    getUser();
+    getUserData();
   }, []);
 
   const handlePayment = async (plan: string, amount: number) => {
