@@ -22,7 +22,7 @@ DevIntel AI is a cutting-edge, AI-powered platform designed to accelerate develo
 | **Backend** | Next.js API Routes (Edge Runtime where applicable) |
 | **Database** | [Supabase](https://supabase.com/) (PostgreSQL) |
 | **Authentication** | Supabase Auth |
-| **AI Engine** | [Anthropic Claude 3.5](https://www.anthropic.com/) (Sonnet/Opus) |
+| **AI Engine** | [Google Gemini 2.5 Flash](https://aistudio.google.com/) |
 | **Payments** | [Razorpay](https://razorpay.com/) |
 
 ## 🚀 Getting Started
@@ -32,7 +32,7 @@ DevIntel AI is a cutting-edge, AI-powered platform designed to accelerate develo
 - Node.js 18+ 
 - npm or yarn
 - A Supabase account
-- An Anthropic API Key
+- A Google AI Studio (Gemini) API Key
 
 ### Installation
 
@@ -53,8 +53,8 @@ DevIntel AI is a cutting-edge, AI-powered platform designed to accelerate develo
    NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
    NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
    SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
-   ANTHROPIC_API_KEY=your_anthropic_api_key
-   ANTHROPIC_MODEL=claude-3-5-sonnet-latest
+   GOOGLE_API_KEY=your_google_api_key
+   GEMINI_MODEL=gemini-2.5-flash
    RAZORPAY_KEY_ID=your_razorpay_key
    RAZORPAY_KEY_SECRET=your_razorpay_secret
    GITHUB_ACCESS_TOKEN=your_github_token
