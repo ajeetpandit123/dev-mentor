@@ -17,6 +17,8 @@ import { supabase } from '@/lib/supabase';
 
 export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const [profile, setProfile] = React.useState<any>(null);
+  const [user, setUser] = React.useState<any>(null);
 
   const navItems = [
     { icon: LayoutDashboard, label: 'Overview', href: '/dashboard' },
@@ -30,6 +32,20 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
 
   React.useEffect(() => {
+    async function loadProfile() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (session?.user) {
+        setUser(session.user);
+        const { data } = await supabase
+          .from('profiles')
+          .select('avatar_url, full_name')
+          .eq('id', session.user.id)
+          .single();
+        setProfile(data);
+      }
+    }
+    loadProfile();
+
     const handleTrigger = () => setShowLogoutModal(true);
     window.addEventListener('trigger-logout-modal', handleTrigger);
     return () => window.removeEventListener('trigger-logout-modal', handleTrigger);
@@ -41,6 +57,8 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
     router.push('/login');
     router.refresh();
   };
+
+  const avatarUrl = profile?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.email || 'default'}`;
 
   return (
     <div className="flex h-screen bg-background overflow-hidden relative">
@@ -59,7 +77,7 @@ export function DashboardLayout({ children }: { children: React.ReactNode }) {
               <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full" />
             </button>
             <Link href="/settings" className="w-8 h-8 rounded-full overflow-hidden border border-primary/20">
-              <img src="https://api.dicebear.com/7.x/avataaars/svg?seed=Ajeet" alt="Avatar" className="w-full h-full object-cover" />
+              <img src={avatarUrl} alt="Avatar" className="w-full h-full object-cover" />
             </Link>
           </div>
         </div>

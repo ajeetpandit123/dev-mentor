@@ -44,6 +44,20 @@ export default function SettingsPage() {
 
   const [openDropdown, setOpenDropdown] = useState<string | null>(null);
 
+  // Avatar Options
+  const avatarOptions = [
+    'https://api.dicebear.com/7.x/avataaars/svg?seed=Alex&eyebrows=default&mouth=smile',
+    'https://api.dicebear.com/7.x/avataaars/svg?seed=Jordan&top=shortHair&accessories=round',
+    'https://api.dicebear.com/7.x/avataaars/svg?seed=Felix&top=shavedSides',
+    'https://api.dicebear.com/7.x/avataaars/svg?seed=Max&facialHair=shortBeard',
+    'https://api.dicebear.com/7.x/avataaars/svg?seed=Leo&top=frizzle',
+    'https://api.dicebear.com/7.x/avataaars/svg?seed=Sarah&top=longHair&mouth=smile',
+    'https://api.dicebear.com/7.x/avataaars/svg?seed=Maya&top=bob&accessories=prescription02',
+    'https://api.dicebear.com/7.x/avataaars/svg?seed=Elena&top=curly&mouth=smile',
+    'https://api.dicebear.com/7.x/avataaars/svg?seed=Luna&top=bun',
+    'https://api.dicebear.com/7.x/avataaars/svg?seed=Zoe&top=longHairCurly'
+  ];
+
   useEffect(() => {
     async function loadData() {
       try {
@@ -163,7 +177,7 @@ export default function SettingsPage() {
             <div className="relative inline-block mt-4">
               <div className="w-32 h-32 rounded-full border-4 border-primary/20 p-1 bg-[#0a0a0a]">
                 <img 
-                  src={profile?.avatar_url || "https://api.dicebear.com/7.x/avataaars/svg?seed=Ajeet"} 
+                  src={profile?.avatar_url || `https://api.dicebear.com/7.x/avataaars/svg?seed=${user?.email}`} 
                   alt="Profile" 
                   className="w-full h-full rounded-full object-cover" 
                 />
@@ -417,16 +431,38 @@ export default function SettingsPage() {
                     />
                   </div>
                   
+                  <div className="space-y-4">
+                    <label className="text-xs font-bold text-muted-foreground uppercase">Choose Avatar</label>
+                    <div className="grid grid-cols-5 gap-3">
+                      {avatarOptions.map((url, i) => (
+                        <button 
+                          key={i}
+                          onClick={() => setEditAvatar(url)}
+                          className={cn(
+                            "relative w-12 h-12 rounded-full overflow-hidden border-2 transition-all hover:scale-110 active:scale-95",
+                            editAvatar === url ? "border-primary shadow-[0_0_15px_rgba(168,85,247,0.5)]" : "border-white/10"
+                          )}
+                        >
+                          <img src={url} alt={`Avatar ${i}`} className="w-full h-full object-cover" />
+                          {editAvatar === url && (
+                            <div className="absolute inset-0 bg-primary/20 flex items-center justify-center">
+                              <CheckCircle2 className="w-4 h-4 text-white" />
+                            </div>
+                          )}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
                   <div className="space-y-2">
-                    <label className="text-xs font-bold text-muted-foreground uppercase">Avatar URL</label>
+                    <label className="text-xs font-bold text-muted-foreground uppercase">Custom Avatar URL</label>
                     <input 
                       type="text" 
                       value={editAvatar}
                       onChange={(e) => setEditAvatar(e.target.value)}
-                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 outline-none"
+                      className="w-full bg-white/5 border border-white/10 rounded-xl px-4 py-3 focus:ring-2 focus:ring-primary/50 outline-none text-xs"
                       placeholder="https://example.com/avatar.png"
                     />
-                    <p className="text-[10px] text-muted-foreground">Tip: Use Dicebear or Gravatar URLs for custom avatars.</p>
                   </div>
 
                   <div className="pt-4 flex gap-4">
