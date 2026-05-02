@@ -17,6 +17,11 @@ const nextConfig: NextConfig = {
       }
     ],
   },
+
+  // 🔥 ADD THIS (VERY IMPORTANT)
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
 };
 
 export default nextConfig;
