@@ -25,7 +25,11 @@ export default function LoginPage() {
 
       if (signInError) throw signInError;
 
-      window.location.href = '/dashboard';
+      // Handle redirect
+      const params = new URLSearchParams(window.location.search);
+      const redirectTo = params.get('redirectedFrom') || '/dashboard';
+      window.location.href = redirectTo;
+      
     } catch (err: any) {
       console.error('Login Error:', err);
       setError(err.message || 'Invalid email or password');
@@ -142,4 +146,3 @@ export default function LoginPage() {
     </div>
   );
 }
-
