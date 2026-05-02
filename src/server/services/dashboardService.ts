@@ -53,7 +53,9 @@ export async function getDashboardData(userId?: string) {
       recommendations.push({
         title: "Weak Zone Fix",
         desc: resumeAnalysis.weakPoints[0],
-        icon: 'alert'
+        icon: 'alert',
+        action: 'resume',
+        link: '/analyze/resume'
       });
     }
 
@@ -62,7 +64,9 @@ export async function getDashboardData(userId?: string) {
       recommendations.push({
         title: "Strength Booster",
         desc: resumeAnalysis.suggestions[0],
-        icon: 'rocket'
+        icon: 'rocket',
+        action: 'resume',
+        link: '/analyze/resume'
       });
     }
 
@@ -71,7 +75,9 @@ export async function getDashboardData(userId?: string) {
       recommendations.push({
         title: "Code Quality Tip",
         desc: repoAnalysis.feedback[0],
-        icon: 'zap'
+        icon: 'zap',
+        action: 'repo',
+        link: '/analyze/repo'
       });
     }
 
@@ -79,7 +85,9 @@ export async function getDashboardData(userId?: string) {
       recommendations.push({
         title: "Get Started",
         desc: "Upload your resume to see your weak and strong zones.",
-        icon: 'rocket'
+        icon: 'rocket',
+        action: 'resume',
+        link: '/analyze/resume'
       });
     }
 

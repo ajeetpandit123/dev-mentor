@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
+import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { motion } from 'framer-motion';
 import { 
@@ -13,7 +14,8 @@ import {
   AlertCircle,
   CheckCircle2,
   Loader2,
-  Zap
+  Zap,
+  ChevronRight
 } from 'lucide-react';
 
 export default function DashboardPage() {
@@ -234,6 +236,7 @@ export default function DashboardPage() {
                         icon={Icon} 
                         title={rec.title} 
                         desc={rec.desc}
+                        link={rec.link}
                       />
                     );
                   })}
@@ -292,15 +295,23 @@ function StatCard({ title, value, sub, trend, icon: Icon }: any) {
   );
 }
 
-function RecommendationItem({ icon: Icon, title, desc }: any) {
+function RecommendationItem({ icon: Icon, title, desc, link }: any) {
+  const router = useRouter();
+  
   return (
-    <div className="flex gap-4 p-3 rounded-xl hover:bg-accent/50 transition-colors cursor-pointer group">
-      <div className="w-10 h-10 rounded-lg bg-white/5 flex-shrink-0 flex items-center justify-center group-hover:bg-primary/20 transition-colors">
-        <Icon className="w-5 h-5 text-muted-foreground group-hover:text-primary transition-colors" />
+    <div 
+      onClick={() => link && router.push(link)}
+      className="flex gap-4 p-4 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-primary/30 hover:bg-primary/5 transition-all cursor-pointer group active:scale-[0.98]"
+    >
+      <div className="w-12 h-12 rounded-xl bg-white/5 flex-shrink-0 flex items-center justify-center group-hover:bg-primary/20 transition-all border border-white/5">
+        <Icon className="w-6 h-6 text-muted-foreground group-hover:text-primary transition-all" />
       </div>
-      <div>
-        <h5 className="text-sm font-bold">{title}</h5>
-        <p className="text-xs text-muted-foreground">{desc}</p>
+      <div className="flex-1 min-w-0">
+        <h5 className="text-sm font-bold flex items-center gap-2">
+          {title}
+          <ChevronRight className="w-3 h-3 opacity-0 group-hover:opacity-100 transition-all group-hover:translate-x-1" />
+        </h5>
+        <p className="text-xs text-muted-foreground line-clamp-2 mt-1 leading-relaxed">{desc}</p>
       </div>
     </div>
   );

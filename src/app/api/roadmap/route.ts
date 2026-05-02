@@ -50,22 +50,41 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing data' }, { status: 400 });
     }
 
-    // Upsert ensures we update the existing roadmap for the user instead of duplicating
-    const { data, error } = await supabase
+    // Manual upsert logic to avoid onConflict errors without a unique constraint
+    const { data: existing } = await supabase
       .from('roadmaps')
-      .upsert({
-        user_id: userId,
-        roadmap_json: roadmapJson,
-        created_at: new Date().toISOString()
-      }, {
-        onConflict: 'user_id'
-      })
-      .select()
-      .single();
+      .select('id')
+      .eq('user_id', userId)
+      .maybeSingle();
 
-    if (error) throw error;
+    let result;
+    if (existing) {
+      const { data, error } = await supabase
+        .from('roadmaps')
+        .update({
+          roadmap_json: roadmapJson,
+          created_at: new Date().toISOString()
+        })
+        .eq('id', existing.id)
+        .select()
+        .single();
+      if (error) throw error;
+      result = data;
+    } else {
+      const { data, error } = await supabase
+        .from('roadmaps')
+        .insert({
+          user_id: userId,
+          roadmap_json: roadmapJson,
+          created_at: new Date().toISOString()
+        })
+        .select()
+        .single();
+      if (error) throw error;
+      result = data;
+    }
 
-    return NextResponse.json(data);
+    return NextResponse.json(result);
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
