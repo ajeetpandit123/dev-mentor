@@ -1,13 +1,6 @@
 import { createServerClient, type CookieOptions } from '@supabase/ssr';
 import { NextResponse, type NextRequest } from 'next/server';
 
-/**
- * Next.js Middleware for Auth Protection
- * 
- * This ensures that sensitive routes like /dashboard, /chat, and /settings 
- * are only accessible to authenticated users. Unauthenticated users are 
- * redirected to the login page.
- */
 export async function middleware(request: NextRequest) {
   let response = NextResponse.next({
     request: {
@@ -61,9 +54,9 @@ export async function middleware(request: NextRequest) {
     }
   );
 
+  // This will refresh the session if it's expired
   const { data: { user } } = await supabase.auth.getUser();
 
-  // Define protected and public routes
   const isProtectedRoute = 
     request.nextUrl.pathname.startsWith('/dashboard') ||
     request.nextUrl.pathname.startsWith('/chat') ||
@@ -75,7 +68,7 @@ export async function middleware(request: NextRequest) {
     request.nextUrl.pathname.startsWith('/login') ||
     request.nextUrl.pathname.startsWith('/register');
 
-  // Redirection Logic
+  // If no user and trying to access protected route, redirect to login
   if (!user && isProtectedRoute) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
@@ -83,10 +76,9 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
+  // If user is logged in and trying to access login/register, redirect to dashboard
   if (user && isAuthRoute) {
-    const url = request.nextUrl.clone();
-    url.pathname = '/dashboard';
-    return NextResponse.redirect(url);
+    return NextResponse.redirect(new URL('/dashboard', request.url));
   }
 
   return response;
@@ -94,14 +86,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    /*
-     * Match all request paths except for the ones starting with:
-     * - _next/static (static files)
-     * - _next/image (image optimization files)
-     * - favicon.ico (favicon file)
-     * - api (API routes - handled separately or allowed)
-     * - logo.png (branding)
-     */
     '/((?!_next/static|_next/image|favicon.ico|api|logo.png|.*\\.svg).*)',
   ],
 };
