@@ -13,7 +13,7 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "DevMentor AI | Elevate Your Coding Career",
+  title: "DevIntel | Elevate Your Coding Career",
   description: "Personalized AI mentorship, code analysis, and career growth for developers.",
 };
 

@@ -20,12 +20,9 @@ export default function LandingPage() {
       {/* Navigation */}
       <nav className="fixed top-0 w-full z-50 border-b border-white/10 glass">
         <div className="max-w-7xl mx-auto px-4 h-16 flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
-              <Code2 className="text-primary-foreground w-5 h-5" />
-            </div>
-            <span className="text-xl font-bold tracking-tight">DevMentor AI</span>
-          </div>
+          <Link href="/" className="block">
+            <img src="/logo.png" alt="DevIntel" className="h-8 w-auto" />
+          </Link>
           <div className="hidden md:flex items-center gap-8 text-sm font-medium text-muted-foreground">
             <Link href="#features" className="hover:text-foreground transition-colors">Features</Link>
             <Link href="#how-it-works" className="hover:text-foreground transition-colors">How it Works</Link>
@@ -57,7 +54,7 @@ export default function LandingPage() {
             </span>
             <h1 className="text-5xl md:text-7xl font-bold mb-6 tracking-tight leading-tight">
               Scale Your Coding Career <br />
-              <span className="gradient-text">With DevMentor AI</span>
+              <span className="gradient-text">With DevIntel</span>
             </h1>
             <p className="text-lg md:text-xl text-muted-foreground mb-10 max-w-2xl mx-auto">
               Analyze your code, optimize your resume, and follow personalized roadmaps designed to get you hired at top tech companies.
@@ -155,7 +152,7 @@ export default function LandingPage() {
 
       {/* Footer */}
       <footer className="py-12 border-t border-white/10 text-center text-muted-foreground text-sm">
-        <p>&copy; 2026 DevMentor AI. Built with ❤️ for the dev community.</p>
+        <p>&copy; 2026 DevIntel. Built with ❤️ for the dev community.</p>
       </footer>
     </div>
   );

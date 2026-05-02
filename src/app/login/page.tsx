@@ -59,11 +59,8 @@ export default function LoginPage() {
         className="max-w-md w-full"
       >
         <div className="text-center mb-8">
-          <Link href="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center">
-              <Code2 className="text-primary-foreground w-6 h-6" />
-            </div>
-            <span className="text-2xl font-bold tracking-tight">DevMentor AI</span>
+          <Link href="/" className="inline-block mb-8">
+            <img src="/logo.png" alt="DevIntel" className="h-12 w-auto mx-auto" />
           </Link>
           <h1 className="text-3xl font-bold">Welcome back</h1>
           <p className="text-muted-foreground mt-2">Continue your professional growth journey.</p>

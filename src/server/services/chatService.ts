@@ -20,7 +20,7 @@ export async function getMentorResponse(messages: any[], context: any = {}, mode
   } = context;
 
   const systemPrompt = `
-    You are "DevMentor AI", a world-class technical mentor.
+    You are "DevIntel", a world-class technical mentor.
     USER: ${userName} (${experience} ${role})
     FOCUS: ${techStack} -> ${targetRole}
     

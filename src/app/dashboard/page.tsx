@@ -33,7 +33,14 @@ export default function DashboardPage() {
         const res = await fetch('/api/dashboard', { headers });
         const apiData = await res.json();
         
-        // --- REAL-TIME ROADMAP SYNC (Access the Real) ---
+        /**
+         * REAL-TIME ROADMAP SYNCHRONIZATION (Access the Real)
+         * 
+         * This section bridges the gap between the server-side dashboard data 
+         * and the user's interactive learning progress. It prioritizes 
+         * the database (Supabase) for persistence and falls back to 
+         * localStorage for instant feedback.
+         */
         let skillProgress = apiData.stats?.skillProgress || 64;
         let roadmapTasks = apiData.stats?.roadmapTasks || "12/18";
         let skillDevelopment = [0, 0, 0, 0, 0, 0, 0]; 
@@ -41,7 +48,11 @@ export default function DashboardPage() {
         let roadmapData = null;
         
         try {
-          // 1. Try DB Sync first
+          /**
+           * 1. Database Sync (Primary Source)
+           * Fetches the latest roadmap state from Supabase to ensure 
+           * progress is consistent across devices.
+           */
           const userId = session?.user?.id;
           if (userId) {
             const dbRes = await fetch(`/api/roadmap?userId=${userId}`);
@@ -51,7 +62,11 @@ export default function DashboardPage() {
             }
           }
 
-          // 2. Fallback to cache if DB empty
+          /**
+           * 2. Local Fallback (Secondary Source)
+           * If the user is offline or the DB is empty, we check the browser 
+           * cache to retrieve the last known state.
+           */
           if (!roadmapData) {
             const cached = localStorage.getItem('dev_monitor_roadmap');
             if (cached) roadmapData = JSON.parse(cached);
@@ -59,16 +74,26 @@ export default function DashboardPage() {
 
           if (roadmapData) {
             const steps = roadmapData.steps || [];
+            
+            // Progress Calculation: Based on total topics across all weeks
             const totalTopics = steps.reduce((acc: number, s: any) => acc + (s.topics?.length || 0), 0);
             const completedTopics = steps.reduce((acc: number, s: any) => acc + (s.completedTopics?.length || 0), 0);
+            
+            // Week Completion: Based on individual week status
             const totalWeeks = steps.length;
             const completedWeeks = steps.filter((s: any) => s.status === 'completed').length;
 
             if (totalTopics > 0) {
+              // Map roadmap stats to dashboard cards
               skillProgress = Math.round((completedTopics / totalTopics) * 100);
               roadmapTasks = `${completedWeeks}/${totalWeeks} Weeks`;
             }
 
+            /**
+             * Skill Development Chart Sync
+             * Maps the historical 7-day progress array to the Bar Chart.
+             * If no history exists, it initializes the current day's slot.
+             */
             if (roadmapData.history) {
               skillDevelopment = roadmapData.history;
             } else {

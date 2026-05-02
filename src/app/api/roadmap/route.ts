@@ -6,6 +6,11 @@ const supabase = createClient(
   process.env.SUPABASE_SERVICE_ROLE_KEY!
 );
 
+/**
+ * GET: Retrieves the user's latest active roadmap.
+ * Query Params: userId (string)
+ * Returns: The roadmap record from Supabase including the structured JSON steps and progress history.
+ */
 export async function GET(req: Request) {
   try {
     const { searchParams } = new URL(req.url);
@@ -31,6 +36,12 @@ export async function GET(req: Request) {
   }
 }
 
+/**
+ * POST: Persists or updates the user's roadmap state.
+ * Body: { userId: string, roadmapJson: object }
+ * Logic: Uses an upsert operation to maintain exactly one active roadmap per user 
+ * while ensuring all progress (checklist state, history) is saved securely in the cloud.
+ */
 export async function POST(req: Request) {
   try {
     const { userId, roadmapJson } = await req.json();
@@ -39,8 +50,7 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: 'Missing data' }, { status: 400 });
     }
 
-    // Upsert or insert new roadmap
-    // For now, let's just insert a new one to keep history, or update if we want one active roadmap
+    // Upsert ensures we update the existing roadmap for the user instead of duplicating
     const { data, error } = await supabase
       .from('roadmaps')
       .upsert({

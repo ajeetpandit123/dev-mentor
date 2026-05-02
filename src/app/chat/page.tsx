@@ -3,12 +3,12 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { DashboardLayout } from '@/components/layout/DashboardLayout';
 import { motion, AnimatePresence } from 'framer-motion';
-import { 
-  Send, 
-  Bot, 
-  User, 
-  Code2, 
-  Sparkles, 
+import {
+  Send,
+  Bot,
+  User,
+  Code2,
+  Sparkles,
   Paperclip,
   Smile,
   MoreVertical,
@@ -77,8 +77,8 @@ function ChatContent() {
   const [isLoading, setIsLoading] = useState(false);
   const [showEmojis, setShowEmojis] = useState(false);
   const [showMenu, setShowMenu] = useState(false);
-  const [attachedFile, setAttachedFile] = useState<{name: string, content: string} | null>(null);
-  
+  const [attachedFile, setAttachedFile] = useState<{ name: string, content: string } | null>(null);
+
   const [emojiCategory, setEmojiCategory] = useState('smilies');
 
   const hasInitiatedRef = useRef(false);
@@ -86,7 +86,7 @@ function ChatContent() {
   // Load Sessions and Initial Chat
   useEffect(() => {
     loadSessions();
-    
+
     if (initialPrompt && !hasInitiatedRef.current) {
       hasInitiatedRef.current = true;
       handleInitialPrompt(initialPrompt);
@@ -103,14 +103,14 @@ function ChatContent() {
       sendBtn?.click();
     }, 500);
   };
-  
+
   const EMOJI_DATA: any = {
-    smilies: ['😀','😃','😄','😁','😅','😂','🤣','😊','😇','🙂','🙃','😉','😌','😍','🥰','😘','😗','😙','😚','😋','😛','😝','😜','🤪','🤨','🧐','🤓','😎','🤩','🥳','😏','😒','😞','😔','😟','😕','🙁','☹️','😣','😖','😫','😩','🥺','😢','😭','😤','😠','😡','🤬','🤯','😳','🥵','🥶','😱','😨','😰','😥','😓','🤗','🤔','🤭','🤫','🤥','😶','😐','😑','😬','🙄','😯','😦','😧','😮','😲','🥱','😴','🤤','😪','😵','🤐','🥴','🤢','🤮','🤧','😷','🤒','🤕','🤑','🤠','😈','👿','👹','👺','🤡','👻','💀','☠️','👽','👾','🤖','💩','😺','😸','😹','😻','😼','😽','🙀','😿','😾'],
-    nature: ['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯','🦁','🐮','🐷','🐽','🐸','🐵','🙈','🙉','🙊','🐒','🐔','🐧','🐦','🐤','🐣','🐥','🦆','🦅','🦉','🦇','🐺','🐗','🐴','🦄','🐝','🐛','🦋','🐌','🐞','🐜','🦟','🦗','🕷','🕸','🦂','🐢','🐍','🦎','🦖','🦕','🐙','🦑','🦐','🦞','🦀','🐡','🐠','🐟','🐬','🐳','🐋','🦈','🐊','🐅','🐆','🦓','🦍','🦧','🐘','🦛','🦏','🐪','🐫','🦒','🦘','🐃','🐂','🐄','🐎','🐖','🐏','🐑','🐐','🦌','🐕','🐩','🦮','🐕‍🦺','🐈','🐓','🦃','🦚','🦜','🦢','🦩','🕊','🐇','🦝','🦨','🦡','🦦','🦥','🐁','🐀','🐿','🦔','🐾','🐉','🐲','🌵','🎄','🌲','🌳','🌴','🌱','🌿','☘️','🍀','🎍','🎋','🍃','🍂','🍁','🍄','🐚','🌾','💐','🌷','🌹','🥀','🌺','🌸','🌼','🌻','🌞','🌝','🌛','🌜','🌚','🌕','🌖','🌗','🌘','🌑','🌒','🌓','🌔','🌙','🌎','🌍','🌏','🪐','💫','⭐️','🌟','✨','⚡️','☄️','💥','🔥','🌪','🌈','☀️','🌤','⛅️','🌥','☁️','🌦','🌧','⛈','🌩','❄️','☃️','⛄️','🌬','💨','💧','💦','☔️','☂️','🌊','🌫'],
-    food: ['🍏','🍎','🍐','🍊','🍋','🍌','🍉','🍇','🍓','🍈','🍒','🍑','🥭','🍍','🥥','🥝','🍅','🍆',' avocado','🥑','🥦','🥬','🥒','🌶','🌽','🥕','🥔','🍠','🥐','🍞','🥖','🥨','🥯','🥞','🧇','🧀','🍖','🍗','🥩','🥓','🍔','🍟','🍕','🌭','🥪','🌮','🌯','🥙','🍳','🥘','🍲','🥣','🥗','🍿','🧈','🧂','🥫','🍱','🍘','🍙','🍚','🍛','🍜','🍝','🍠','🍢','🍣','🍤','🍥','🥮','🍡','🥟','🥠','🥡','🦀','🦞','🦐','🦑','🍦','🍧','🍨','🍩','🍪','🎂','🍰','🧁','🥧','🍫','🍬','🍭','🍮','🍯','🍼','🥛','☕️','🍵','🧉','🍶','🍺','🍻','🥂','🍷','🥃','🍸','🍹','🍾','🧊','🥤','🥢','🍽','🍴','🥄'],
-    tech: ['💻','🖥','🖨','⌨️','🖱','🖲','🕹','🗜','💽','💾','💿','📀','📱','📲','☎️','📞','📟','📠','🔋','🔌','🎬','🎞','📽','📺','📷','📸','📹','📼','🔍','🔎','💡','🔦','🏮','🪓','🧱','⛓','🧰','🧲','🧪','🔬','🔭','📡','💉','💊','🩹','🩸','🧬','🦠','🧫','🧹','🧺','🧻','🧼','🧽','🪒','🧴'],
-    travel: ['🚗','🚕','🚙','🚌','🚎','🏎','🚓','🚑','🚒','🚐','🚚','🚛','🚜','🚲','🛵','🏍','🚨','🚔','🚍','🚘','🚖','🚡','🚠','🚟','🚃','🚋','🚞','🚝','🚄','🚅','🚈','🚂','🚆','🚇','🚊','🚉','✈️','🛫','🛬','🛩','💺','🛰','🚀','🛸','🚁','🛶','⛵️','🚤','🛥','🛳','⛴','🚢','⚓️','🚧','⛽️','🚏','🗺','🗿','🗽','🗼','🏰','🏯','🏟','🎡','🎢','🎠','⛱','🏖','🏝','🏜','🌋','⛰','🏔','🗻','🏕','⛺️','🏠','🏡','🏘','🏚','🏗','🏭','🏢','🏬','🏣','🏤','🏥','🏦','🏨','🏪','🏫','🏩','💒','🏛','⛪️','🕌','🕍','🛕','🕋','⛩','🛤','🛣','🗾','🎑','🏞','🌅','🌄','🌇','🌆','🏙','🌃','🌌','🌉','🌁'],
-    symbols: ['❤️','🧡','💛','💚','💙','💜','🖤','🤍','🤎','💔','❣️','💕','💞','💓','💗','💖','💘','💝','💟','☮️','✝️','☪️','☸️','✡️','🔯','🕎','☯️','☦️','🛐','⛎','♈️','♉️','♊️','♋️','♌️','♍️','♎️','♏️','♐️','♑️','♒️','♓️','🆔','⚛️','🉑','☢️','☣️','📴','📳','🈶','🈚️','✴️','🆚','💮','🉐','㊙️','㊗️','🈴','🈵','🈹','🈲','🅰️','🅱️','🆕','🆖','🅾️','🆗','🅿️','🆘','🆙','🆒','🆓','0️⃣','1️⃣','2️⃣','3️⃣','4️⃣','5️⃣','6️⃣','7️⃣','8️⃣','9️⃣','🔟','🔢','#️⃣','*️⃣','⏏️','▶️','⏸','⏯','⏹','⏺','⏭','⏮','⏩','⏪','⏫','⏬','◀️','🔼','🔽','➡️','⬅️','⬆️','⬇️','↗️','↘️','↙️','↖️','↕️','↔️','↪️','↩️','⤴️','⤵️','🔀','🔁','🔂','🔄','🔃','🎵','🎶','➕','➖','➗','✖️','♾','💲','💱','™️','©️','®️','✔️','☑️','🔘','🔴','🟠','🟡','🟢','🔵','🟣','⚫️','⚪️','🟤','🔺','🔻','🔸','🔹','🔶','🔷','🔳','🔲','▪️','▫️','◾️','◽️','◼️','◻️','🟥','🟧','🟨','🟩','🟦','🟪','⬛️','⬜️','🟫','🔈','🔇','🔉','🔊','🔔','🔕','📣','📢','💬','💭','🗯','♠️','♣️','♥️','♦️','🃏','🎴','🀄️','🕐','🕑','🕒','🕓','🕔','🕕','🕖','🕗','🕘','🕙','🕚','🕛']
+    smilies: ['😀', '😃', '😄', '😁', '😅', '😂', '🤣', '😊', '😇', '🙂', '🙃', '😉', '😌', '😍', '🥰', '😘', '😗', '😙', '😚', '😋', '😛', '😝', '😜', '🤪', '🤨', '🧐', '🤓', '😎', '🤩', '🥳', '😏', '😒', '😞', '😔', '😟', '😕', '🙁', '☹️', '😣', '😖', '😫', '😩', '🥺', '😢', '😭', '😤', '😠', '😡', '🤬', '🤯', '😳', '🥵', '🥶', '😱', '😨', '😰', '😥', '😓', '🤗', '🤔', '🤭', '🤫', '🤥', '😶', '😐', '😑', '😬', '🙄', '😯', '😦', '😧', '😮', '😲', '🥱', '😴', '🤤', '😪', '😵', '🤐', '🥴', '🤢', '🤮', '🤧', '😷', '🤒', '🤕', '🤑', '🤠', '😈', '👿', '👹', '👺', '🤡', '👻', '💀', '☠️', '👽', '👾', '🤖', '💩', '😺', '😸', '😹', '😻', '😼', '😽', '🙀', '😿', '😾'],
+    nature: ['🐶', '🐱', '🐭', '🐹', '🐰', '🦊', '🐻', '🐼', '🐨', '🐯', '🦁', '🐮', '🐷', '🐽', '🐸', '🐵', '🙈', '🙉', '🙊', '🐒', '🐔', '🐧', '🐦', '🐤', '🐣', '🐥', '🦆', '🦅', '🦉', '🦇', '🐺', '🐗', '🐴', '🦄', '🐝', '🐛', '🦋', '🐌', '🐞', '🐜', '🦟', '🦗', '🕷', '🕸', '🦂', '🐢', '🐍', '🦎', '🦖', '🦕', '🐙', '🦑', '🦐', '🦞', '🦀', '🐡', '🐠', '🐟', '🐬', '🐳', '🐋', '🦈', '🐊', '🐅', '🐆', '🦓', '🦍', '🦧', '🐘', '🦛', '🦏', '🐪', '🐫', '🦒', '🦘', '🐃', '🐂', '🐄', '🐎', '🐖', '🐏', '🐑', '🐐', '🦌', '🐕', '🐩', '🦮', '🐕‍🦺', '🐈', '🐓', '🦃', '🦚', '🦜', '🦢', '🦩', '🕊', '🐇', '🦝', '🦨', '🦡', '🦦', '🦥', '🐁', '🐀', '🐿', '🦔', '🐾', '🐉', '🐲', '🌵', '🎄', '🌲', '🌳', '🌴', '🌱', '🌿', '☘️', '🍀', '🎍', '🎋', '🍃', '🍂', '🍁', '🍄', '🐚', '🌾', '💐', '🌷', '🌹', '🥀', '🌺', '🌸', '🌼', '🌻', '🌞', '🌝', '🌛', '🌜', '🌚', '🌕', '🌖', '🌗', '🌘', '🌑', '🌒', '🌓', '🌔', '🌙', '🌎', '🌍', '🌏', '🪐', '💫', '⭐️', '🌟', '✨', '⚡️', '☄️', '💥', '🔥', '🌪', '🌈', '☀️', '🌤', '⛅️', '🌥', '☁️', '🌦', '🌧', '⛈', '🌩', '❄️', '☃️', '⛄️', '🌬', '💨', '💧', '💦', '☔️', '☂️', '🌊', '🌫'],
+    food: ['🍏', '🍎', '🍐', '🍊', '🍋', '🍌', '🍉', '🍇', '🍓', '🍈', '🍒', '🍑', '🥭', '🍍', '🥥', '🥝', '🍅', '🍆', ' avocado', '🥑', '🥦', '🥬', '🥒', '🌶', '🌽', '🥕', '🥔', '🍠', '🥐', '🍞', '🥖', '🥨', '🥯', '🥞', '🧇', '🧀', '🍖', '🍗', '🥩', '🥓', '🍔', '🍟', '🍕', '🌭', '🥪', '🌮', '🌯', '🥙', '🍳', '🥘', '🍲', '🥣', '🥗', '🍿', '🧈', '🧂', '🥫', '🍱', '🍘', '🍙', '🍚', '🍛', '🍜', '🍝', '🍠', '🍢', '🍣', '🍤', '🍥', '🥮', '🍡', '🥟', '🥠', '🥡', '🦀', '🦞', '🦐', '🦑', '🍦', '🍧', '🍨', '🍩', '🍪', '🎂', '🍰', '🧁', '🥧', '🍫', '🍬', '🍭', '🍮', '🍯', '🍼', '🥛', '☕️', '🍵', '🧉', '🍶', '🍺', '🍻', '🥂', '🍷', '🥃', '🍸', '🍹', '🍾', '🧊', '🥤', '🥢', '🍽', '🍴', '🥄'],
+    tech: ['💻', '🖥', '🖨', '⌨️', '🖱', '🖲', '🕹', '🗜', '💽', '💾', '💿', '📀', '📱', '📲', '☎️', '📞', '📟', '📠', '🔋', '🔌', '🎬', '🎞', '📽', '📺', '📷', '📸', '📹', '📼', '🔍', '🔎', '💡', '🔦', '🏮', '🪓', '🧱', '⛓', '🧰', '🧲', '🧪', '🔬', '🔭', '📡', '💉', '💊', '🩹', '🩸', '🧬', '🦠', '🧫', '🧹', '🧺', '🧻', '🧼', '🧽', '🪒', '🧴'],
+    travel: ['🚗', '🚕', '🚙', '🚌', '🚎', '🏎', '🚓', '🚑', '🚒', '🚐', '🚚', '🚛', '🚜', '🚲', '🛵', '🏍', '🚨', '🚔', '🚍', '🚘', '🚖', '🚡', '🚠', '🚟', '🚃', '🚋', '🚞', '🚝', '🚄', '🚅', '🚈', '🚂', '🚆', '🚇', '🚊', '🚉', '✈️', '🛫', '🛬', '🛩', '💺', '🛰', '🚀', '🛸', '🚁', '🛶', '⛵️', '🚤', '🛥', '🛳', '⛴', '🚢', '⚓️', '🚧', '⛽️', '🚏', '🗺', '🗿', '🗽', '🗼', '🏰', '🏯', '🏟', '🎡', '🎢', '🎠', '⛱', '🏖', '🏝', '🏜', '🌋', '⛰', '🏔', '🗻', '🏕', '⛺️', '🏠', '🏡', '🏘', '🏚', '🏗', '🏭', '🏢', '🏬', '🏣', '🏤', '🏥', '🏦', '🏨', '🏪', '🏫', '🏩', '💒', '🏛', '⛪️', '🕌', '🕍', '🛕', '🕋', '⛩', '🛤', '🛣', '🗾', '🎑', '🏞', '🌅', '🌄', '🌇', '🌆', '🏙', '🌃', '🌌', '🌉', '🌁'],
+    symbols: ['❤️', '🧡', '💛', '💚', '💙', '💜', '🖤', '🤍', '🤎', '💔', '❣️', '💕', '💞', '💓', '💗', '💖', '💘', '💝', '💟', '☮️', '✝️', '☪️', '☸️', '✡️', '🔯', '🕎', '☯️', '☦️', '🛐', '⛎', '♈️', '♉️', '♊️', '♋️', '♌️', '♍️', '♎️', '♏️', '♐️', '♑️', '♒️', '♓️', '🆔', '⚛️', '🉑', '☢️', '☣️', '📴', '📳', '🈶', '🈚️', '✴️', '🆚', '💮', '🉐', '㊙️', '㊗️', '🈴', '🈵', '🈹', '🈲', '🅰️', '🅱️', '🆕', '🆖', '🅾️', '🆗', '🅿️', '🆘', '🆙', '🆒', '🆓', '0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟', '🔢', '#️⃣', '*️⃣', '⏏️', '▶️', '⏸', '⏯', '⏹', '⏺', '⏭', '⏮', '⏩', '⏪', '⏫', '⏬', '◀️', '🔼', '🔽', '➡️', '⬅️', '⬆️', '⬇️', '↗️', '↘️', '↙️', '↖️', '↕️', '↔️', '↪️', '↩️', '⤴️', '⤵️', '🔀', '🔁', '🔂', '🔄', '🔃', '🎵', '🎶', '➕', '➖', '➗', '✖️', '♾', '💲', '💱', '™️', '©️', '®️', '✔️', '☑️', '🔘', '🔴', '🟠', '🟡', '🟢', '🔵', '🟣', '⚫️', '⚪️', '🟤', '🔺', '🔻', '🔸', '🔹', '🔶', '🔷', '🔳', '🔲', '▪️', '▫️', '◾️', '◽️', '◼️', '◻️', '🟥', '🟧', '🟨', '🟩', '🟦', '🟪', '⬛️', '⬜️', '🟫', '🔈', '🔇', '🔉', '🔊', '🔔', '🔕', '📣', '📢', '💬', '💭', '🗯', '♠️', '♣️', '♥️', '♦️', '🃏', '🎴', '🀄️', '🕐', '🕑', '🕒', '🕓', '🕔', '🕕', '🕖', '🕗', '🕘', '🕙', '🕚', '🕛']
   };
 
   const fileInputRef = useRef<HTMLInputElement>(null);
@@ -206,7 +206,7 @@ function ChatContent() {
 
     try {
       const { data: { session } } = await supabase.auth.getSession();
-      
+
       // Handle Session Creation if needed
       let sessionId = currentSessionId;
       if (!sessionId && session) {
@@ -234,7 +234,7 @@ function ChatContent() {
       const response = await fetch('/api/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ 
+        body: JSON.stringify({
           messages: [...messages, userMessage].map(m => ({ role: m.role, content: m.content }))
         }),
       });
@@ -270,10 +270,10 @@ function ChatContent() {
   return (
     <DashboardLayout>
       <div className="max-w-[1400px] mx-auto h-[calc(100vh-8rem)] flex gap-6 p-4">
-        
+
         {/* Sidebar - Recent Chats */}
         <div className="w-80 flex flex-col gap-4">
-          <button 
+          <button
             onClick={startNewChat}
             className="w-full p-4 bg-primary text-white rounded-2xl flex items-center justify-center gap-2 font-bold hover:opacity-90 transition-all shadow-lg shadow-primary/20"
           >
@@ -285,15 +285,14 @@ function ChatContent() {
               <History className="w-4 h-4" />
               <span className="text-[10px] font-black uppercase tracking-widest">Recent Activity</span>
             </div>
-            
+
             <div className="flex-1 overflow-y-auto space-y-2 custom-scrollbar pr-2">
               {sessions.map(s => (
                 <button
                   key={s.id}
                   onClick={() => loadChatMessages(s.id)}
-                  className={`w-full text-left p-3 rounded-xl text-xs font-medium transition-all group relative overflow-hidden ${
-                    currentSessionId === s.id ? 'bg-primary/20 text-primary border border-primary/20' : 'hover:bg-white/5 text-muted-foreground'
-                  }`}
+                  className={`w-full text-left p-3 rounded-xl text-xs font-medium transition-all group relative overflow-hidden ${currentSessionId === s.id ? 'bg-primary/20 text-primary border border-primary/20' : 'hover:bg-white/5 text-muted-foreground'
+                    }`}
                 >
                   <div className="truncate pr-6">{s.title}</div>
                   <div className="text-[8px] opacity-40 mt-1">{new Date(s.created_at).toLocaleDateString()}</div>
@@ -309,40 +308,40 @@ function ChatContent() {
           <div className="relative group bg-card/40 backdrop-blur-xl border border-white/10 rounded-t-3xl p-6 flex items-center justify-between shadow-2xl z-30">
             <div className="flex items-center gap-4">
               <div className="relative">
-                <div className="w-12 h-12 bg-gradient-to-tr from-primary to-primary/40 rounded-2xl flex items-center justify-center text-white shadow-lg">
-                  <Cpu className="w-7 h-7" />
+                <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center overflow-hidden shadow-lg p-1">
+                  <img src="/logo.png" alt="DevIntel" className="w-full h-auto object-contain" />
                 </div>
                 <div className="absolute -bottom-1 -right-1 w-3 h-3 bg-green-500 border-4 border-[#0a0a0a] rounded-full" />
               </div>
               <div>
-                <h3 className="font-black text-lg tracking-tight">DevMentor AI</h3>
+                <h3 className="font-black text-lg tracking-tight">DevIntel</h3>
                 <p className="text-[9px] text-primary font-black uppercase tracking-widest">Active Mentorship Session</p>
               </div>
             </div>
 
             <div className="relative z-50">
-              <button 
+              <button
                 onClick={() => setShowMenu(!showMenu)}
                 className="w-10 h-10 rounded-xl bg-white/5 border border-white/10 flex items-center justify-center hover:bg-white/10 transition-all"
               >
                 <MoreVertical className="w-5 h-5 text-muted-foreground" />
               </button>
-              
+
               <AnimatePresence>
                 {showMenu && (
-                  <motion.div 
+                  <motion.div
                     initial={{ opacity: 0, y: 10, scale: 0.95 }}
                     animate={{ opacity: 1, y: 0, scale: 1 }}
                     exit={{ opacity: 0, y: 10, scale: 0.95 }}
                     className="absolute right-0 mt-3 w-56 bg-[#121212] border border-white/10 rounded-2xl shadow-[0_20px_50px_rgba(0,0,0,0.5)] z-[100] overflow-hidden backdrop-blur-2xl"
                   >
-                    <button 
+                    <button
                       onClick={() => { setMessages([]); setShowMenu(false); }}
                       className="w-full flex items-center gap-3 p-4 text-xs font-bold text-red-500 hover:bg-red-500/10 transition-all"
                     >
                       <Trash2 className="w-4 h-4" /> Clear Chat
                     </button>
-                    <button 
+                    <button
                       onClick={handleExportPDF}
                       className="w-full flex items-center gap-3 p-4 text-xs font-bold hover:bg-white/5 transition-all"
                     >
@@ -355,7 +354,7 @@ function ChatContent() {
           </div>
 
           {/* Messages Area */}
-          <div 
+          <div
             ref={scrollRef}
             className="flex-1 overflow-y-auto bg-[#0a0a0a]/60 backdrop-blur-md border-x border-white/5 p-8 space-y-8 custom-scrollbar relative"
           >
@@ -374,14 +373,12 @@ function ChatContent() {
                 className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
               >
                 <div className={`flex gap-4 max-w-[85%] ${msg.role === 'user' ? 'flex-row-reverse' : ''}`}>
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${
-                    msg.role === 'user' ? 'bg-primary text-white' : 'bg-white/5 border border-white/10 text-primary'
-                  }`}>
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 ${msg.role === 'user' ? 'bg-primary text-white' : 'bg-white/5 border border-white/10 text-primary'
+                    }`}>
                     {msg.role === 'user' ? <User className="w-5 h-5" /> : <Bot className="w-5 h-5" />}
                   </div>
-                  <div className={`p-6 rounded-[2rem] shadow-2xl ${
-                    msg.role === 'user' ? 'bg-primary text-white rounded-tr-none' : 'bg-card/80 border border-white/10 rounded-tl-none'
-                  }`}>
+                  <div className={`p-6 rounded-[2rem] shadow-2xl ${msg.role === 'user' ? 'bg-primary text-white rounded-tr-none' : 'bg-card/80 border border-white/10 rounded-tl-none'
+                    }`}>
                     <MarkdownMessage content={msg.content} role={msg.role} />
                   </div>
                 </div>
@@ -401,11 +398,11 @@ function ChatContent() {
 
           {/* Input Panel */}
           <div className="bg-card/40 backdrop-blur-xl border border-white/10 rounded-b-3xl p-6 relative">
-            
+
             {/* File Attachment Badge */}
             <AnimatePresence>
               {attachedFile && (
-                <motion.div 
+                <motion.div
                   initial={{ opacity: 0, y: 10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: 10 }}
@@ -420,15 +417,15 @@ function ChatContent() {
 
             <div className="flex items-end gap-4 bg-black/40 border border-white/10 rounded-2xl px-5 py-3 focus-within:border-primary/50 transition-all">
               <input type="file" ref={fileInputRef} onChange={handleFileUpload} className="hidden" />
-              <button 
+              <button
                 onClick={() => fileInputRef.current?.click()}
                 className="mb-2 text-muted-foreground hover:text-primary transition-all"
               >
                 <Paperclip className="w-5 h-5" />
               </button>
-              
-              <textarea 
-                placeholder="Message DevMentor..."
+
+              <textarea
+                placeholder="Message DevIntel..."
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); handleSend(); } }}
@@ -439,7 +436,7 @@ function ChatContent() {
                 <button onClick={() => setShowEmojis(!showEmojis)} className={`transition-all hover:scale-110 active:scale-95 ${showEmojis ? 'text-yellow-500' : 'text-muted-foreground hover:text-yellow-500'}`}>
                   <Smile className="w-6 h-6" />
                 </button>
-                
+
                 <AnimatePresence>
                   {showEmojis && (
                     <motion.div
@@ -454,9 +451,8 @@ function ChatContent() {
                           <button
                             key={cat}
                             onClick={() => setEmojiCategory(cat)}
-                            className={`flex-1 min-w-[60px] py-1.5 text-[9px] font-black uppercase rounded-lg transition-all ${
-                              emojiCategory === cat ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'hover:bg-white/10 text-muted-foreground'
-                            }`}
+                            className={`flex-1 min-w-[60px] py-1.5 text-[9px] font-black uppercase rounded-lg transition-all ${emojiCategory === cat ? 'bg-primary text-white shadow-lg shadow-primary/20' : 'hover:bg-white/10 text-muted-foreground'
+                              }`}
                           >
                             {cat}
                           </button>
@@ -481,7 +477,7 @@ function ChatContent() {
                     </motion.div>
                   )}
                 </AnimatePresence>
-                <button 
+                <button
                   id="send-message-btn"
                   onClick={handleSend}
                   disabled={(!input.trim() && !attachedFile) || isLoading}

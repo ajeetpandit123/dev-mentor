@@ -49,7 +49,7 @@ export default function PricingPage() {
         key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID, 
         amount: order.amount,
         currency: order.currency,
-        name: "DevMentor AI",
+        name: "DevIntel",
         description: `Upgrade to ${plan} Plan`,
         order_id: order.id,
         handler: async function (response: any) {
