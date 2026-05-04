@@ -107,7 +107,7 @@ export async function getDashboardData(userId?: string) {
         { label: "Skill Gap Coverage", progress: Math.min(100, (resumeAnalysis.keywordsFound?.length || 0) * 10) },
         { label: "Code Quality", progress: (latestRepo?.score || 0) * 10 }
       ],
-      recentActivity: activities?.map(a => ({
+      recentActivity: activities?.map((a: any) => ({
         time: formatTime(a.created_at),
         title: a.title,
         desc: a.description

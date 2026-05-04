@@ -28,7 +28,7 @@ export async function POST(req: NextRequest) {
           techStack: settings?.tech_stack,
           focusAreas: settings?.focus_areas,
           latestResumeAnalysis: resumes?.[0]?.analysis_result,
-          analyzedProjects: projects?.map(p => ({ name: p.repo_name, score: p.score }))
+          analyzedProjects: projects?.map((p: any) => ({ name: p.repo_name, score: p.score }))
         };
       } catch (dbError) {
         console.warn('Safe Context Loading: Database error ignored to keep chat alive', dbError);

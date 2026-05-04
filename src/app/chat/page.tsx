@@ -157,7 +157,7 @@ function ChatContent() {
       .order('created_at', { ascending: true });
 
     if (data) {
-      setMessages(data.map(m => ({
+      setMessages(data.map((m: any) => ({
         id: m.id,
         role: m.role,
         content: m.content,
