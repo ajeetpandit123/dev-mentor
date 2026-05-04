@@ -4,14 +4,18 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.warn('Supabase credentials missing. Database features will not work.');
+  if (process.env.NODE_ENV !== 'production') {
+    console.warn('Supabase credentials missing. Database features will not work.');
+  }
 }
 
 /**
  * Client-side Supabase instance.
  * Uses @supabase/ssr createBrowserClient to ensure cookies are shared with the server.
  */
-export const supabase = createBrowserClient(supabaseUrl, supabaseAnonKey);
+export const supabase = (supabaseUrl && supabaseAnonKey) 
+  ? createBrowserClient(supabaseUrl, supabaseAnonKey) 
+  : null as any;
 
 /**
  * Admin/Service instance for secure backend operations.

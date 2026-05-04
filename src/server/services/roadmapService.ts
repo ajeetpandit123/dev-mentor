@@ -1,5 +1,5 @@
 import { callSmartAI } from './aiService';
-import { getServiceSupabase } from '@/lib/supabase';
+import { getServiceSupabase } from '@/lib/supabaseServer';
 
 /**
  * Roadmap Service

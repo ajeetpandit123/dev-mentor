@@ -1,4 +1,4 @@
-import { getServiceSupabase } from '@/lib/supabase';
+import { getServiceSupabase } from '@/lib/supabaseServer';
 import { callSmartAI } from './aiService';
 import pdf from 'pdf-parse';
 

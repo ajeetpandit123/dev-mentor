@@ -1,4 +1,4 @@
-import { getServiceSupabase } from '@/lib/supabase';
+import { getServiceSupabase } from '@/lib/supabaseServer';
 
 export async function getDashboardData(userId?: string) {
   const adminSupabase = getServiceSupabase();
