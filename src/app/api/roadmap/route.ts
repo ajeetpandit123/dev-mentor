@@ -1,10 +1,5 @@
 import { NextResponse } from 'next/server';
-import { createClient } from '@supabase/supabase-js';
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+import { getServiceSupabase } from '@/lib/supabaseServer';
 
 /**
  * GET: Retrieves the user's latest active roadmap.
@@ -13,6 +8,7 @@ const supabase = createClient(
  */
 export async function GET(req: Request) {
   try {
+    const supabase = getServiceSupabase();
     const { searchParams } = new URL(req.url);
     const userId = searchParams.get('userId');
 
@@ -44,6 +40,7 @@ export async function GET(req: Request) {
  */
 export async function POST(req: Request) {
   try {
+    const supabase = getServiceSupabase();
     const { userId, roadmapJson } = await req.json();
 
     if (!userId || !roadmapJson) {
