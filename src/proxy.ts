@@ -54,7 +54,6 @@ export async function proxy(request: NextRequest) {
     }
   );
 
-  // This will refresh the session if it's expired
   const { data: { user } } = await supabase.auth.getUser();
 
   const isProtectedRoute = 
@@ -68,7 +67,6 @@ export async function proxy(request: NextRequest) {
     request.nextUrl.pathname.startsWith('/login') ||
     request.nextUrl.pathname.startsWith('/register');
 
-  // If no user and trying to access protected route, redirect to login
   if (!user && isProtectedRoute) {
     const url = request.nextUrl.clone();
     url.pathname = '/login';
@@ -76,7 +74,6 @@ export async function proxy(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  // If user is logged in and trying to access login/register, redirect to dashboard
   if (user && isAuthRoute) {
     return NextResponse.redirect(new URL('/dashboard', request.url));
   }
