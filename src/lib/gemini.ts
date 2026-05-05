@@ -20,26 +20,42 @@ export async function callGemini(
   }
 
   const genAI = new GoogleGenerativeAI(apiKey);
-  
-  try {
-    // Using Stable v1 API for Gemini 2.5
-    const model = genAI.getGenerativeModel(
-      { model: modelName },
-      { apiVersion: 'v1' }
-    );
+  const maxRetries = 3;
+  let lastError: any = null;
 
-    console.log(`[Gemini SDK] Using Gemini 2.5 Flash: ${modelName}`);
+  for (let i = 0; i < maxRetries; i++) {
+    const currentModel = i === maxRetries - 1 ? 'gemini-1.5-flash' : modelName;
+    
+    try {
+      const model = genAI.getGenerativeModel(
+        { model: currentModel },
+        { apiVersion: 'v1' }
+      );
 
-    const lastMessage = messages[messages.length - 1].content;
-    const combinedPrompt = system 
-      ? `Instructions: ${system}\n\nUser Input: ${lastMessage}` 
-      : lastMessage;
+      console.log(`[Gemini SDK] Attempt ${i + 1}: Using ${currentModel}`);
 
-    const result = await model.generateContent(combinedPrompt);
-    const response = await result.response;
-    return response.text();
-  } catch (error: any) {
-    console.error(`[Gemini SDK] Error with ${modelName}:`, error.message);
-    throw error;
+      const lastMessage = messages[messages.length - 1].content;
+      const combinedPrompt = system 
+        ? `Instructions: ${system}\n\nUser Input: ${lastMessage}` 
+        : lastMessage;
+
+      const result = await model.generateContent(combinedPrompt);
+      const response = await result.response;
+      return response.text();
+    } catch (error: any) {
+      lastError = error;
+      console.warn(`[Gemini SDK] Attempt ${i + 1} failed:`, error.message);
+      
+      // If it's a 503 or 429, wait and retry
+      if (error.message?.includes('503') || error.message?.includes('429')) {
+        const delay = Math.pow(2, i) * 1000;
+        await new Promise(resolve => setTimeout(resolve, delay));
+        continue;
+      }
+      
+      throw error;
+    }
   }
+
+  throw lastError;
 }
