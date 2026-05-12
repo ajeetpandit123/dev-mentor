@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "dev": "set NODE_OPTIONS=--max-old-space-size=4096 && next dev",
+    "dev:port": "set NODE_OPTIONS=--max-old-space-size=4096 && next dev -p 3005",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
